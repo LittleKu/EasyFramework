@@ -1,0 +1,12 @@
+import("//common.gni")
+
+if (is_mac) {
+} else {
+  shared_library("libef") {
+    sources = [ "src/main.cc" ]
+  }
+}
+
+group("easy_framework") {
+  deps = [ ":libef" ]
+}
