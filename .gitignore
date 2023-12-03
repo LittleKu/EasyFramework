@@ -66,6 +66,7 @@
 .cipd
 .vscode
 .vscode-server
+.landmines
 
 /.vs/
 
