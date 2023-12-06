@@ -1,0 +1,2 @@
+import(
+    "//base/allocator/partition_allocator/build_overrides/partition_alloc.gni")

@@ -16,48 +16,90 @@ vars = {
   'llvm_force_head_revision': False,
   
   # GN CIPD package version.
-  'gn_version': 'git_revision:811d332bd90551342c5cbd39e133aa276022d7f8',
+  'gn_version': 'git_revision:991530ce394efb58fcd848195469022fa17ae126',
 }
 
 deps = {
   'src/base':
-    'https://chromium.googlesource.com/chromium/src/base@66d8d5e9f16e58b9b4bca27d7d47956a03a84e66',
+    'https://chromium.googlesource.com/chromium/src/base@0a5148acfea9cf842c9accc82ccb8309d847b775',
   'src/build':
-    'https://chromium.googlesource.com/chromium/src/build@fae7f5a6e095ef83977c093fd918e96b1490f070',
+    'https://chromium.googlesource.com/chromium/src/build@bc10f9ffb962f14c3ed18a6cd9c2f5114d9b0b59',
   'src/buildtools':
-    'https://chromium.googlesource.com/chromium/src/buildtools@a9a6f0c49d0e8fa0cda37337430b4736ab3dc944',
+    'https://chromium.googlesource.com/chromium/src/buildtools@50c348906cbd450e031bc3123b657f833f8455b7',
   'src/third_party':
-    'https://chromium.googlesource.com/chromium/src/third_party@2f6e93c5cc1f5e03c79e807a0da961518e6702d1',
+    'https://chromium.googlesource.com/chromium/src/third_party@6b9e7118bf887abf87fe2f557b60d5a695cba1e3',
   'src/testing':
-    'https://chromium.googlesource.com/chromium/src/testing@a74d88c832e5e94183495288b73a281608e7f7d7',
+    'https://chromium.googlesource.com/chromium/src/testing@074ff55a07fb690e769eda906375f8e7cb6b39b8',
   'src/third_party/clang-format/script':
     'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/clang/tools/clang-format.git@e5337933f2951cacd3aeacd238ce4578163ca0b9',
   'src/third_party/libc++/src':
-    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git@84fb809dd6dae36d556dc0bb702c6cc2ce9d4b80',
+    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git@7cf98622abaf832e2d4784889ebc69d5b6fde4d8',
   'src/third_party/libc++abi/src':
-    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git@cc2a32ba831d2246511e0bab34011c48534b405c',
+    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git@e8e4eb8f1c413ea4365256b2b83a6093c95d2d86',
   'src/third_party/libunwind/src':
-    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libunwind.git@b113f23e4c61d00e3e7160a2d36b74d7c179364c',
+    'https://chromium.googlesource.com/external/github.com/llvm/llvm-project/libunwind.git@43e5a34c5b7066a7ee15c74f09dc37b4b9b5630e',
   'src/third_party/boringssl/src':
-    'https://boringssl.googlesource.com/boringssl.git@e4acd6cb568214b1c7db4e59ce54ea2e1deae1f5',
+    'https://boringssl.googlesource.com/boringssl.git@d24a38200fef19150eef00cad35b138936c08767',
+  'src/third_party/breakpad/breakpad':
+    'https://chromium.googlesource.com/breakpad/breakpad.git@8988364bcddd9b194b0bf931c10bc125987330ed',
   'src/third_party/catapult':
-    'https://chromium.googlesource.com/catapult.git@dd218dfd815774289f8a81015f7a3131f72afbde',
-  'src/third_party/ced/src':
-    'https://chromium.googlesource.com/external/github.com/google/compact_enc_det.git@ba412eaaacd3186085babcd901679a48863c7dd5',
-  'src/third_party/icu':
-    'https://chromium.googlesource.com/chromium/deps/icu.git@de4ce0071eb47ed54cbda54869001210cf3a8ae5',
-  'src/third_party/perfetto':
-    'https://android.googlesource.com/platform/external/perfetto.git@a03468a6498ecbf939f6ff4dd9014f55e2c3ab34',
+    'https://chromium.googlesource.com/catapult.git@4f81c1e295978227d83f1b42ceff40b4f9b5b08c',
+  'src/third_party/ced/src': {
+    'url': 'https://chromium.googlesource.com/external/github.com/google/compact_enc_det.git@ba412eaaacd3186085babcd901679a48863c7dd5',
+  },
+  'src/third_party/colorama/src':
+    'https://chromium.googlesource.com/external/colorama.git@3de9f013df4b470069d03d250224062e8cf15c49',
+  'src/third_party/crc32c/src':
+    'https://chromium.googlesource.com/external/github.com/google/crc32c.git@fa5ade41ee480003d9c5af6f43567ba22e4e17e6',
   'src/third_party/depot_tools':
-    'https://chromium.googlesource.com/chromium/tools/depot_tools.git@07289ce9416e01b0682696a698282cb22ce6d486',
-  # Used by boringssl.
-  'src/third_party/nasm':
-    'https://chromium.googlesource.com/chromium/deps/nasm.git@7fc833e889d1afda72c06220e5bed8fb43b2e5ce',
-  'src/tools':
-    'https://chromium.googlesource.com/chromium/src/tools@72d26ce1944bf4e492ab87779029d52f0b05d79a',
+    'https://chromium.googlesource.com/chromium/tools/depot_tools.git@90a30a5b5357636fa05bb315c393275be7ca705c',
+  'src/third_party/flatbuffers/src':
+    'https://chromium.googlesource.com/external/github.com/google/flatbuffers.git@0343396e49d1c0bf4ca1058130efd9585ecb3c8f',
+  'src/third_party/grpc/src': {
+    'url': 'https://chromium.googlesource.com/external/github.com/grpc/grpc.git@822dab21d9995c5cf942476b35ca12a1aa9d2737',
+  },
+  'src/third_party/freetype/src':
+    'https://chromium.googlesource.com/chromium/src/third_party/freetype2.git@7b308a29dd105074eea9c8d5953a182d325f74f1',
+  'src/third_party/harfbuzz-ng/src':
+    'https://chromium.googlesource.com/external/github.com/harfbuzz/harfbuzz.git@db700b5670d9475cc8ed4880cc9447b232c5e432',
+  'src/third_party/google_benchmark/src': {
+    'url': 'https://chromium.googlesource.com/external/github.com/google/benchmark.git@b177433f3ee2513b1075140c723d73ab8901790f',
+  },
   'src/third_party/googletest/src':
     'https://chromium.googlesource.com/external/github.com/google/googletest.git@af29db7ec28d6df1c7f0f745186884091e602e07',
+  'src/third_party/icu': {
+    'url': 'https://chromium.googlesource.com/chromium/deps/icu.git@985b9a6f70e13f3db741fed121e4dcc3046ad494',
+  },
+  'src/third_party/jsoncpp/source':
+    'https://chromium.googlesource.com/external/github.com/open-source-parsers/jsoncpp.git@42e892d96e47b1f6e29844cc705e148ec4856448',
+  'src/third_party/perfetto':
+    'https://android.googlesource.com/platform/external/perfetto.git@d3bf532f84cf34f899c5785043ceb4af8f76d4e3',
+  'src/third_party/nasm': {
+      'url': 'https://chromium.googlesource.com/chromium/deps/nasm.git@7fc833e889d1afda72c06220e5bed8fb43b2e5ce'
+  },
+  'src/tools':
+    'https://chromium.googlesource.com/chromium/src/tools@33a950a48cf447a6b1c0262e9955446e6d129d34',
 
+  'src/third_party/ninja': {
+    'packages': [
+      {
+        'package': 'infra/3pp/tools/ninja/${{platform}}',
+        'version': Var('ninja_version'),
+      }
+    ],
+    'dep_type': 'cipd',
+  },
+  
+  'src/tools/resultdb': {
+    'packages': [
+      {
+        'package': 'infra/tools/result_adapter/${{platform}}',
+        'version': Var('resultdb_version'),
+      },
+    ],
+    'dep_type': 'cipd',
+  },
+  
   'src/buildtools/mac': {
     'packages': [
       {
@@ -206,6 +248,17 @@ hooks = [
                 '--no_auth',
                 '--bucket', 'chromium-browser-clang/rc',
                 '-s', 'src/build/toolchain/win/rc/mac/rc.sha1',
+    ],
+  },
+  {
+    'name': 'test_fonts',
+    'pattern': '.',
+    'action': [ 'download_from_google_storage',
+                '--no_resume',
+                '--extract',
+                '--no_auth',
+                '--bucket', 'chromium-fonts',
+                '-s', 'src/third_party/test_fonts/test_fonts.tar.gz.sha1',
     ],
   },
 ]

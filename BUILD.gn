@@ -1,5 +1,6 @@
 import("//common.gni")
 
 group("default") {
-  deps = ["//easy_framework"]
+  testonly = true
+  deps = [ "//easy_framework" ]
 }

@@ -2,11 +2,37 @@ import("//common.gni")
 
 if (is_mac) {
 } else {
+  config("easy_app_config") {
+    ldflags = [ "/SUBSYSTEM:WINDOWS" ]
+
+    if (is_clang) {
+      cflags = [ "-Wno-undef" ]
+    }
+  }
+
+  executable("easy_app") {
+    testonly = true
+
+    configs += [ ":easy_app_config" ]
+
+    sources = [ "app/app.cc" ]
+
+    deps = [
+      ":libef",
+      "//base",
+    ]
+  }
+
   shared_library("libef") {
+    testonly = true
+
     sources = [ "src/main.cc" ]
+
+    deps = [ "//base" ]
   }
 }
 
 group("easy_framework") {
-  deps = [ ":libef" ]
+  testonly = true
+  deps = [ ":easy_app" ]
 }
