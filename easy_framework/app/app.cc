@@ -4,9 +4,31 @@
 #include <Windows.h>
 
 #include "base/command_line.h"
+#include "base/files/file_path.h"
+#include "base/logging.h"
+#include "base/path_service.h"
 #include "base/win/windows_types.h"
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
+  base::CommandLine::Init(0, nullptr);
+
+  base::FilePath cur;
+  base::PathService::Get(base::DIR_EXE, &cur);
+  base::FilePath log_file = cur.Append(L"app.log");
+
+  logging::LoggingSettings settings;
+  settings.delete_old = logging::DELETE_OLD_LOG_FILE;
+  settings.lock_log = logging::DONT_LOCK_LOG_FILE;
+  settings.logging_dest = logging::LOG_TO_ALL;
+  settings.log_file_path = log_file.value().c_str();
+  logging::InitLogging(settings);
+  logging::SetMinLogLevel(logging::LOG_INFO);
+  logging::SetLogItems(true, true, true, true);
+
+  {
+    LOG(INFO) << "start logging...";
+  }
+
   return 0;
 }
 #else
