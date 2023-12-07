@@ -1,9 +1,16 @@
 #ifndef EASY_FRAMEWORK_INCLUDE_BASE_H_
-#define EASY_FRAMEWORK_INCLUDE_BASE_H__
+#define EASY_FRAMEWORK_INCLUDE_BASE_H_
 
 struct IWeakObject;
 
 struct IBaseInterface {
+  /**
+   * @brief Get Interface unique identifier
+   *
+   * @return
+   */
+  virtual const char* Unique() const = 0;
+
   /**
    * @brief
    *
@@ -66,4 +73,11 @@ struct IWeakObject {
   virtual bool Lock(IBaseInterface** strong_ptr) = 0;
 };
 
-#endif  // !EASY_FRAMEWORK_INCLUDE_BASE_H__
+#define DECLARE_INTERFACE_UNIQUE(UniqueType) \
+  const char* Unique() const override {      \
+    return #UniqueType;                      \
+  }
+
+#define INTERFACE_UNIQUE(UniqueType) #UniqueType
+
+#endif  // !EASY_FRAMEWORK_INCLUDE_BASE_H_

@@ -26,7 +26,15 @@ if (is_mac) {
   shared_library("libef") {
     testonly = true
 
-    sources = [ "src/main.cc" ]
+    sources = [
+      "src/export.def",
+      "src/main.cc",
+    ]
+
+    sources += [
+      "src/ef_system_impl.cc",
+      "src/ef_system_impl.h",
+    ]
 
     deps = [ "//base" ]
   }
