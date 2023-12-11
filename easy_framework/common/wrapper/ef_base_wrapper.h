@@ -1,3 +1,9 @@
+/**
+ * @file      : ef_base_wrapper.h
+ * @author    : LittleKu<kklvzl@gmail.com>
+ * @date      : 2023-12-07 14:27:55
+ * @brief     :
+ */
 #ifndef EASY_FRAMEWORK_COMMON_WRAPPER_BASE_H_
 #define EASY_FRAMEWORK_COMMON_WRAPPER_BASE_H_
 
@@ -12,19 +18,19 @@ namespace common {
 
 namespace wrapper {
 
-class WeakReference final : public IWeakObject {
-  IBaseInterface* host_ptr_{nullptr};
+class WeakReference final : public IWeakRef {
+  IRefBase* host_ptr_{nullptr};
   RefCount* ref_ptr_{nullptr};
   mutable base::AtomicRefCount ref_count_{0};
 
  public:
-  WeakReference(IBaseInterface* host_ptr, RefCount* ref_ptr)
+  WeakReference(IRefBase* host_ptr, RefCount* ref_ptr)
       : host_ptr_(host_ptr), ref_ptr_(ref_ptr) {
     ref_ptr_->AddRefWeak();
   }
-  inline virtual ~WeakReference() { ref_ptr_->ReleaseWeak(); }
+  virtual ~WeakReference() { ref_ptr_->ReleaseWeak(); }
 
- public:  // override IWeakObject methods
+ public:  // override IWeakReft methods
   void AddRef() const override { ref_count_.Increment(); }
 
   bool Release() const override {
@@ -38,7 +44,7 @@ class WeakReference final : public IWeakObject {
 
   bool Expired() const override { return !ref_ptr_->HasAtLeastOneRef(); }
 
-  bool Lock(IBaseInterface** strong_ptr) override {
+  bool Lock(IRefBase** strong_ptr) override {
     if (strong_ptr == nullptr) {
       return false;
     }
@@ -52,17 +58,17 @@ class WeakReference final : public IWeakObject {
   }
 };
 
-template <typename Interface,
-          typename = std::enable_if<
-              std::is_convertible<Interface*, IBaseInterface*>::value>::type>
-class BaseInterfaceImpl : public Interface {
-  using This = BaseInterfaceImpl<Interface>;
+template <typename _Ty,
+          typename =
+              std::enable_if<std::is_convertible<_Ty*, IRefBase*>::value>::type>
+class RefBaseImpl : public _Ty {
+  using This = RefBaseImpl<_Ty>;
 
  public:
-  BaseInterfaceImpl() : ref_ptr_(new RefCount) { ref_ptr_->AddRefWeak(); }
-  virtual ~BaseInterfaceImpl() { ref_ptr_->ReleaseWeak(); }
+  RefBaseImpl() : ref_ptr_(new RefCount) { ref_ptr_->AddRefWeak(); }
+  virtual ~RefBaseImpl() { ref_ptr_->ReleaseWeak(); }
 
-  // override IBaseInterface methods
+  // override IRefBase methods
   void AddRef() const override { ref_ptr_->AddRefImpl(); }
 
   bool Release() const override {
@@ -72,26 +78,11 @@ class BaseInterfaceImpl : public Interface {
     }
     return false;
   }
-  bool QueryInterface(const char* interface_unique,
-                      IBaseInterface** out_interface) const override {
-    if (!out_interface || !interface_unique ||
-        !std::char_traits<char>::length(interface_unique)) {
+
+  bool GetWeakRef(IWeakRef** out_weak_ref) const override {
+    if (!out_weak_ref) {
       return false;
     }
-
-    if (std::char_traits<char>::compare(
-            interface_unique, Unique(),
-            std::char_traits<char>::length(interface_unique)) == 0) {
-      AddRef();
-      *out_interface = const_cast<This*>(this);
-      return true;
-    }
-    return false;
-  }
-
-  bool GetWeakRef(IWeakObject** out_weak_ref) const override {
-    if (!out_weak_ref)
-      return false;
 
     auto* weak_ref = new WeakReference(const_cast<This*>(this), ref_ptr_);
     weak_ref->AddRef();

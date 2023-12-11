@@ -9,6 +9,9 @@
 #include "base/path_service.h"
 #include "base/win/windows_types.h"
 
+#include "easy_framework/include/ef_base.h"
+#include "easy_framework/include/ef_system.h"
+
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
   base::CommandLine::Init(0, nullptr);
 

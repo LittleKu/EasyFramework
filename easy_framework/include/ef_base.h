@@ -1,16 +1,15 @@
+/**
+ * @file      : ef_base.h
+ * @author    : LittleKu<kklvzl@gmail.com>
+ * @date      : 2023-12-07 14:14:23
+ * @brief     :
+ */
 #ifndef EASY_FRAMEWORK_INCLUDE_BASE_H_
 #define EASY_FRAMEWORK_INCLUDE_BASE_H_
 
-struct IWeakObject;
+struct IWeakRef;
 
-struct IBaseInterface {
-  /**
-   * @brief Get Interface unique identifier
-   *
-   * @return
-   */
-  virtual const char* Unique() const = 0;
-
+struct IRefBase {
   /**
    * @brief
    *
@@ -20,9 +19,27 @@ struct IBaseInterface {
   /**
    * @brief
    *
-   * @return true will release object,otherwise decrement reference
+   * @return true
+   * @return false
    */
   virtual bool Release() const = 0;
+
+  /**
+   * @brief Get the Weak Ref object
+   *
+   * @param out_weak_ref
+   * @return true on success, false on failure
+   */
+  virtual bool GetWeakRef(IWeakRef** out_weak_ref) const = 0;
+};
+
+struct IBaseInterface : public IRefBase {
+  /**
+   * @brief Get Interface unique identifier
+   *
+   * @return
+   */
+  virtual const char* Unique() const = 0;
 
   /**
    * @brief Query interface
@@ -35,28 +52,23 @@ struct IBaseInterface {
                               IBaseInterface** out_interface) const = 0;
 
   /**
-   * @brief Get the Weak Ref object
+   * @brief Connect to the host interface
    *
-   * @param out_weak_ref
-   * @return true on success,false on failure
+   * @param host interface that can query this interface
+   * @return true on success, false on failure
    */
-  virtual bool GetWeakRef(IWeakObject** out_weak_ref) const = 0;
+  virtual bool ConnectInterface(IBaseInterface* host) = 0;
 };
 
-struct IWeakObject {
+struct IWeakRef : public IRefBase {
   /**
-   * @brief
+   * @brief Override and disable this method on Weak reference object
    *
    */
-  virtual void AddRef() const = 0;
-
-  /**
-   * @brief
-   *
-   * @return true will release object,otherwise decrement reference
-   */
-  virtual bool Release() const = 0;
-
+  bool GetWeakRef(IWeakRef**) const final {
+    // disable
+    return false;
+  }
   /**
    * @brief Deteting the validity of the host pointer.
    *
@@ -70,14 +82,18 @@ struct IWeakObject {
    * @param strong_ptr
    * @return true success, otherwise failure
    */
-  virtual bool Lock(IBaseInterface** strong_ptr) = 0;
+  virtual bool Lock(IRefBase** strong_ptr) = 0;
 };
 
 #define DECLARE_INTERFACE_UNIQUE(UniqueType) \
-  const char* Unique() const override {      \
-    return #UniqueType;                      \
+ public:                                     \
+  const char* Unique() const override
+
+#define INTERFACE_UNIQUE_IMPL(UniqueType, Impl) \
+  const char* Impl::Unique() const {            \
+    return #UniqueType;                         \
   }
 
-#define INTERFACE_UNIQUE(UniqueType) #UniqueType
+#define INTERFACE_UNIQUE(UniqueType) [] { return #UniqueType; }()
 
 #endif  // !EASY_FRAMEWORK_INCLUDE_BASE_H_
