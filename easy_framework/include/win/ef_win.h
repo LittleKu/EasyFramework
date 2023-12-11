@@ -9,4 +9,6 @@ typedef HRESULT(__stdcall* FN_QUERY_INTERFACE)(const char*, IBaseInterface**);
 
 typedef HMODULE HLIBRARY;
 
+STDAPI QueryInterface(const char*, IBaseInterface**);
+
 #endif  // EASY_FRAMEWORK_INCLUDE_WIN_H_

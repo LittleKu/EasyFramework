@@ -2,7 +2,7 @@
  * @file      : ef_ref_count.h
  * @author    : LittleKu<kklvzl@gmail.com>
  * @date      : 2023-12-07 14:27:11
- * @brief     : 
+ * @brief     :
  */
 #ifndef EASY_FRAMEWORK_COMMON_REF_COUNT_H_
 #define EASY_FRAMEWORK_COMMON_REF_COUNT_H_
@@ -25,14 +25,9 @@ class RefCount final {
   /**
    * @brief
    *
-   * @return int
    */
-  int AddRefImpl() const {
-    int pre_increment_count = strong_ref_count_.Increment();
-    CHECK_GT(pre_increment_count, 0);
-    CHECK_NE(pre_increment_count, std::numeric_limits<int>::max());
-
-    return pre_increment_count;
+  void AddRefImpl() const {
+    CHECK_NE(strong_ref_count_.Increment(), std::numeric_limits<int>::max());
   }
 
   /**
@@ -50,15 +45,9 @@ class RefCount final {
   /**
    * @brief
    *
-   * @return int
    */
-  int AddRefWeak() const {
-    int pre_increment_count = weak_ref_count_.Increment();
-
-    CHECK_GT(pre_increment_count, 0);
-    CHECK_NE(pre_increment_count, std::numeric_limits<int>::max());
-
-    return pre_increment_count;
+  void AddRefWeak() const {
+    CHECK_NE(weak_ref_count_.Increment(), std::numeric_limits<int>::max());
   }
 
   /**
