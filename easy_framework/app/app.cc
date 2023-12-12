@@ -6,11 +6,14 @@
 #include "base/command_line.h"
 #include "base/files/file_path.h"
 #include "base/logging.h"
+#include "base/native_library.h"
 #include "base/path_service.h"
 #include "base/win/windows_types.h"
 
+#include "easy_framework/common/ef_refptr.h"
 #include "easy_framework/include/ef_base.h"
 #include "easy_framework/include/ef_system.h"
+#include "easy_framework/include/win/ef_win.h"
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
   base::CommandLine::Init(0, nullptr);
@@ -29,7 +32,15 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
   logging::SetLogItems(true, true, true, true);
 
   {
-    LOG(INFO) << "start logging...";
+    ef::common::EFRefPtr<IEFSystem> sys = nullptr;
+    QueryInterface(INTERFACE_UNIQUE(IEFSystem),
+                   reinterpret_cast<IBaseInterface**>(sys.addressof()));
+
+    if (sys) {
+      sys->Initialize(instance);
+
+      sys->Uninitialize();
+    }
   }
 
   return 0;

@@ -7,6 +7,9 @@
 #ifndef EASY_FRAMEWORK_SYSTEM_IMPL_H_
 #define EASY_FRAMEWORK_SYSTEM_IMPL_H_
 
+#include "base/sequence_checker.h"
+#include "base/task/sequence_manager/sequence_manager_impl.h"
+
 #include "easy_framework/common/wrapper/ef_base_interface_wrapper.h"
 #include "easy_framework/include/ef_system.h"
 
@@ -30,8 +33,11 @@ class EFSystemImpl final
  public:  // override IEFSystem methods
   bool Initialize(void* instance) override;
   bool Uninitialize() override;
+  bool CreateThreadPoolTaskRunner(ITaskRunner** out_task_runner) override;
 
  private:
+  HINSTANCE instance_{nullptr};
+  SEQUENCE_CHECKER(sequence_checker_);
 };
 
 }  // namespace ef

@@ -34,6 +34,8 @@ if (is_mac) {
     sources += [
       "src/ef_system_impl.cc",
       "src/ef_system_impl.h",
+      "src/ef_thread_pool_task_runner_impl.cc",
+      "src/ef_thread_pool_task_runner_impl.h",
     ]
 
     deps = [ "//base" ]

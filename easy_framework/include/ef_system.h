@@ -8,6 +8,7 @@
 #define EASY_FRAMEWORK_SYSTEM_H_
 
 #include "easy_framework/include/ef_base.h"
+#include "easy_framework/include/ef_task_runner.h"
 
 struct IEFSystem : public IBaseInterface {
   /**
@@ -24,6 +25,15 @@ struct IEFSystem : public IBaseInterface {
    * @return true on success, false on failure
    */
   virtual bool Uninitialize() = 0;
+
+  /**
+   * @brief Create a task runner base on thread pool due to the
+   * {create_thread_pool} is true
+   *
+   * @param out_task_runner
+   * @return true on success, false on failure
+   */
+  virtual bool CreateThreadPoolTaskRunner(ITaskRunner** out_task_runner) = 0;
 };
 
 #endif  // !EASY_FRAMEWORK_SYSTEM_H_
