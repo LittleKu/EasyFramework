@@ -23,7 +23,7 @@ class BaseInterfaceImpl : public RefBaseImpl<_Ty> {
 
  public:  // override IBaseInterface methods
   bool QueryInterface(const char* interface_unique,
-                      IBaseInterface** out_interface) const override {
+                      IBaseInterface** out_interface) override {
     if (!interface_unique ||
         !std::char_traits<char>::length(interface_unique) || out_interface) {
       return false;

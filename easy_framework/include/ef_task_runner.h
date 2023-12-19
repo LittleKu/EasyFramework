@@ -17,7 +17,7 @@ struct ITask : public IRefBase {
   virtual void Run() = 0;
 };
 
-struct ITaskRunner : public IBaseInterface {
+struct IEFTaskRunner : public IBaseInterface {
   /**
    * @brief Post task
    *

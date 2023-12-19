@@ -11,12 +11,12 @@
 #include "easy_framework/include/ef_task_runner.h"
 
 enum MessageLoopType {
-  Default,
+  Default = 0,
   UI,
   IO,
 };
 
-struct IMessageLoop : public IBaseInterface {
+struct IEFMessageLoop : public IBaseInterface {
   /**
    * @brief run message loop
    *
@@ -36,7 +36,21 @@ struct IMessageLoop : public IBaseInterface {
    * @param out_task_runner
    * @return truen on success, otherwise failure
    */
-  virtual bool CreateTaskRunner(ITaskRunner** out_task_runner) = 0;
+  virtual bool CreateTaskRunner(IEFTaskRunner** out_task_runner) = 0;
+
+  /**
+   * @brief
+   *
+   * @return MessageLoopType
+   */
+  virtual int Type() const = 0;
+
+  /**
+   * @brief
+   *
+   * @return true on running, otherwise false
+   */
+  virtual bool IsRunning() const = 0;
 };
 
 #endif  // !EASY_FRAMEWORK_MESSAGE_LOOP_H_

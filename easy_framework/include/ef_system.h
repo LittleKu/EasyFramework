@@ -8,11 +8,15 @@
 #define EASY_FRAMEWORK_SYSTEM_H_
 
 #include "easy_framework/include/ef_base.h"
+#include "easy_framework/include/ef_command_line.h"
+#include "easy_framework/include/ef_interface_factory.h"
+#include "easy_framework/include/ef_message_loop.h"
 #include "easy_framework/include/ef_task_runner.h"
+
 
 struct IEFSystem : public IBaseInterface {
   /**
-   * @brief
+   * @brief not thread safe, must be called on the main thread
    *
    * @param instance process instance
    * @return true on success, false on failure
@@ -20,7 +24,7 @@ struct IEFSystem : public IBaseInterface {
   virtual bool Initialize(void* instance) = 0;
 
   /**
-   * @brief
+   * @brief not thread safe, must be called on the main thread
    *
    * @return true on success, false on failure
    */
@@ -33,7 +37,40 @@ struct IEFSystem : public IBaseInterface {
    * @param out_task_runner
    * @return true on success, false on failure
    */
-  virtual bool CreateThreadPoolTaskRunner(ITaskRunner** out_task_runner) = 0;
+  virtual bool CreateThreadPoolTaskRunner(IEFTaskRunner** out_task_runner) = 0;
+
+  /**
+   * @brief Get the current process command line object
+   *
+   * @param out_command_line
+   * @return true on success, false on failure
+   */
+  virtual bool GetCurrentCommandLine(IEFCommandLine** out_command_line) = 0;
+
+  /**
+   * @brief
+   *
+   * @param unique
+   * @param factory
+   * @return true on success, false on failure
+   */
+  virtual bool RegisterInterfaceFactory(const char* unique,
+                                        IEFInterfaceFactory* factory) = 0;
+  /**
+   * @brief
+   *
+   * @param unique
+   * @return true on success, false on failure
+   */
+  virtual bool UnRegisterInterfaceFactory(const char* unique) = 0;
+
+  /**
+   * @brief Get the Main Message Loop object
+   *
+   * @param out_message_loop
+   * @return true on success, false on failure
+   */
+  virtual bool GetMainMessageLoop(IEFMessageLoop** out_message_loop) = 0;
 };
 
 #endif  // !EASY_FRAMEWORK_SYSTEM_H_

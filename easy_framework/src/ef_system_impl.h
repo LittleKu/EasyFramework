@@ -7,11 +7,20 @@
 #ifndef EASY_FRAMEWORK_SYSTEM_IMPL_H_
 #define EASY_FRAMEWORK_SYSTEM_IMPL_H_
 
+#include "base/at_exit.h"
 #include "base/sequence_checker.h"
+#include "base/synchronization/lock.h"
 #include "base/task/sequence_manager/sequence_manager_impl.h"
 
 #include "easy_framework/common/wrapper/ef_base_interface_wrapper.h"
+#include "easy_framework/include/ef_interface_factory.h"
 #include "easy_framework/include/ef_system.h"
+#include "easy_framework/src/wrapper/ef_interface_factory_wrapper.h"
+
+#include <memory>
+#include <unordered_map>
+
+struct IEFMessageLoop;
 
 namespace ef {
 
@@ -27,17 +36,39 @@ class EFSystemImpl final
 
  public:  // override IBaseInterface method
   bool QueryInterface(const char* interface_unique,
-                      IBaseInterface** out_interface) const final;
+                      IBaseInterface** out_interface) final;
   bool ConnectInterface(IBaseInterface* host) final;
 
  public:  // override IEFSystem methods
   bool Initialize(void* instance) override;
   bool Uninitialize() override;
-  bool CreateThreadPoolTaskRunner(ITaskRunner** out_task_runner) override;
+  bool CreateThreadPoolTaskRunner(IEFTaskRunner** out_task_runner) override;
+  bool GetCurrentCommandLine(IEFCommandLine** out_command_line) override;
+  bool RegisterInterfaceFactory(const char* unique,
+                                IEFInterfaceFactory* factory) override;
+  bool UnRegisterInterfaceFactory(const char* unique) override;
+  bool GetMainMessageLoop(IEFMessageLoop** out_message_loop) override;
+
+  private:
+  template <typename Interface, typename Impl>
+  bool RegisterInterfaceFactoryInternal(const char* unique) {
+    ef::common::EFRefPtr<IEFInterfaceFactory> factory = nullptr;
+    if (ef::wrapper::EFInterfaceFactoryT<Impl>().Clone(factory.addressof())) {
+      return RegisterInterfaceFactory(unique, factory.get());
+    }
+    return false;
+  }
 
  private:
   HINSTANCE instance_{nullptr};
   SEQUENCE_CHECKER(sequence_checker_);
+
+  std::unique_ptr<base::AtExitManager> at_exit_manager_{nullptr};
+  ef::common::EFRefPtr<IEFMessageLoop> main_message_loop_{nullptr};
+
+  base::Lock interface_factory_map_lock_;
+  std::unordered_map<std::string, ef::common::EFRefPtr<IEFInterfaceFactory>>
+      interface_factory_map_;
 };
 
 }  // namespace ef

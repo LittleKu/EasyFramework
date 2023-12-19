@@ -1,11 +1,11 @@
 /**
- * @file      : ef_thread_pool_task_runner_impl.h
+ * @file      : ef_default_task_runner.h
  * @author    : LittleKu<kklvzl@gmail.com>
- * @date      : 2023-12-12 14:41:30
+ * @date      : 2023-12-19 09:15:48
  * @brief     :
  */
-#ifndef EASY_FRAMEWORK_THREAD_POOL_TASK_RUNNER_H_
-#define EASY_FRAMEWORK_THREAD_POOL_TASK_RUNNER_H_
+#ifndef EASY_FRAMEWORK_DEFAULT_TASK_RUNNER_H_
+#define EASY_FRAMEWORK_DEFAULT_TASK_RUNNER_H_
 
 #include "easy_framework/common/wrapper/ef_base_interface_wrapper.h"
 #include "easy_framework/include/ef_task_runner.h"
@@ -15,15 +15,15 @@
 
 namespace ef {
 
-class ThreadPoolTaskRunnerImpl
-    : public ef::common::wrapper::BaseInterfaceImpl<ITaskRunner> {
- public:
-  explicit ThreadPoolTaskRunnerImpl(
-      scoped_refptr<base::SingleThreadTaskRunner> task_runner);
-  ~ThreadPoolTaskRunnerImpl() override;
 
- public:  // override IBaseInterface method
-  const char* Unique() const override;
+class DefaultTaskRunner final
+    : public ef::common::wrapper::BaseInterfaceImpl<IEFTaskRunner> {
+ public:
+  explicit DefaultTaskRunner(
+      scoped_refptr<base::SingleThreadTaskRunner> task_runner);
+  ~DefaultTaskRunner() override;
+
+  DECLARE_INTERFACE_UNIQUE(IEFTaskRunner)
 
  public:  // override ITaskRunner methods
   void PostTask(ITask* task) override;
@@ -35,5 +35,6 @@ class ThreadPoolTaskRunnerImpl
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_{nullptr};
 };
 
+
 }  // namespace ef
-#endif  // !EASY_FRAMEWORK_THREAD_POOL_TASK_RUNNER_H_
+#endif  // !EASY_FRAMEWORK_DEFAULT_TASK_RUNNER_H_

@@ -31,11 +31,19 @@ if (is_mac) {
       "src/main.cc",
     ]
 
+    sources += [ "src/wrapper/ef_interface_factory_wrapper.h" ]
+
     sources += [
+      "src/ef_command_line_impl.cc",
+      "src/ef_command_line_impl.h",
+      "src/ef_default_task_runner.cc",
+      "src/ef_default_task_runner.h",
+      "src/ef_main_ui_message_loop.cc",
+      "src/ef_main_ui_message_loop.h",
       "src/ef_system_impl.cc",
       "src/ef_system_impl.h",
-      "src/ef_thread_pool_task_runner_impl.cc",
-      "src/ef_thread_pool_task_runner_impl.h",
+      "src/ef_thread_impl.cc",
+      "src/ef_thread_impl.h",
     ]
 
     deps = [ "//base" ]

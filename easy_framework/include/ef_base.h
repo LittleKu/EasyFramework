@@ -49,7 +49,7 @@ struct IBaseInterface : public IRefBase {
    * @return true on success,false on failure
    */
   virtual bool QueryInterface(const char* interface_unique,
-                              IBaseInterface** out_interface) const = 0;
+                              IBaseInterface** out_interface) = 0;
 
   /**
    * @brief Connect to the host interface
@@ -87,13 +87,10 @@ struct IWeakRef : public IRefBase {
 
 #define DECLARE_INTERFACE_UNIQUE(UniqueType) \
  public:                                     \
-  const char* Unique() const override
-
-#define INTERFACE_UNIQUE_IMPL(UniqueType, Impl) \
-  const char* Impl::Unique() const {            \
-    return #UniqueType;                         \
+  const char* Unique() const override {      \
+    return #UniqueType;                      \
   }
 
-#define INTERFACE_UNIQUE(UniqueType) [] { return #UniqueType; }()
+#define INTERFACE_UNIQUE(UniqueType)  #UniqueType
 
 #endif  // !EASY_FRAMEWORK_INCLUDE_BASE_H_

@@ -11,9 +11,22 @@
 #include "base/win/windows_types.h"
 
 #include "easy_framework/common/ef_refptr.h"
+#include "easy_framework/common/wrapper/ef_base_wrapper.h"
 #include "easy_framework/include/ef_base.h"
 #include "easy_framework/include/ef_system.h"
 #include "easy_framework/include/win/ef_win.h"
+
+#include <functional>
+
+class TaskImpl : public ef::common::wrapper::RefBaseImpl<ITask> {
+  std::function<void()> m_func;
+
+ public:
+  explicit TaskImpl(const std::function<void()>& func) : m_func(func) {}
+  ~TaskImpl() override = default;
+
+  void Run() override { m_func(); }
+};
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
   base::CommandLine::Init(0, nullptr);
@@ -38,6 +51,16 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
 
     if (sys) {
       sys->Initialize(instance);
+
+      ef::common::EFRefPtr<IEFMessageLoop> main_loop = nullptr;
+      sys->GetMainMessageLoop(main_loop.addressof());
+
+      ef::common::EFRefPtr<IEFTaskRunner> main_task_runner = nullptr;
+      main_loop->CreateTaskRunner(main_task_runner.addressof());
+
+      main_task_runner->PostDelayedTask(
+          new TaskImpl([main_loop] { main_loop->Quit(); }), 10000);
+      main_loop->Run();
 
       sys->Uninitialize();
     }
