@@ -10,14 +10,15 @@
 #include "base/atomic_ref_count.h"
 #include "base/check_op.h"
 
+#include "easy_framework/common/ef_library_ref.h"
 namespace ef {
 
 namespace common {
 
 class RefCount final {
  public:
-  RefCount() = default;
-  ~RefCount() = default;
+  RefCount() { EFLibraryRef::Ref().AddRef(); }
+  ~RefCount() { EFLibraryRef::Ref().Release(); }
 
   RefCount(const RefCount&) = delete;
   RefCount& operator=(const RefCount&) = delete;
