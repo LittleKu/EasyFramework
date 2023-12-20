@@ -83,4 +83,11 @@ bool EFThreadImpl::GetTaskRunner(IEFTaskRunner** out_task_runner) {
   return false;
 }
 
+ThreadId EFThreadImpl::GetThreadId() const {
+  if (IsRunning()) {
+    return thread_->GetThreadId();
+  }
+  return 0;
+}
+
 }  // namespace ef

@@ -3,11 +3,13 @@
 
 #include <Windows.h>
 
-#include "easy_framework/include/ef_base.h"
+struct IBaseInterface;
 
 typedef HRESULT(__stdcall* FN_QUERY_INTERFACE)(const char*, IBaseInterface**);
 
-typedef HMODULE HLIBRARY;
+typedef HMODULE PlatformLibrary;
+
+typedef DWORD ThreadId;
 
 STDAPI QueryInterface(const char*, IBaseInterface**);
 

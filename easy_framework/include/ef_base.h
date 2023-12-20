@@ -89,8 +89,16 @@ struct IWeakRef : public IRefBase {
  public:                                     \
   const char* Unique() const override {      \
     return #UniqueType;                      \
-  }
+  }                                          \
+                                             \
+ private:
 
-#define INTERFACE_UNIQUE(UniqueType)  #UniqueType
+#define INTERFACE_UNIQUE(UniqueType) #UniqueType
+
+#if defined(_WIN32)
+#include "easy_framework/include/win/ef_win.h"
+#else
+// TODO support for Mac OS X
+#endif  // cross platform support
 
 #endif  // !EASY_FRAMEWORK_INCLUDE_BASE_H_

@@ -28,6 +28,7 @@ class EFThreadImpl : public ef::common::wrapper::BaseInterfaceImpl<IEFThread> {
   void Stop() override;
   bool IsRunning() const override;
   bool GetTaskRunner(IEFTaskRunner** out_task_runner) override;
+  ThreadId GetThreadId() const override;
 
  private:
   std::unique_ptr<base::Thread> thread_{nullptr};

@@ -40,6 +40,13 @@ struct IEFThread : public IBaseInterface {
    * @return true on success, false on failure
    */
   virtual bool GetTaskRunner(IEFTaskRunner** out_task_runner) = 0;
+
+  /**
+   * @brief Get current thread id
+   *
+   * @return return the current thread id
+   */
+  virtual ThreadId GetThreadId() const = 0;
 };
 
 #endif  // !EASY_FRAMEWORK_THREAD_H_
