@@ -63,6 +63,14 @@ bool EFSystemImpl::QueryInterface(const char* interface_unique,
     return false;
   }
 
+  if (std::char_traits<char>::compare(
+          Unique(), interface_unique,
+          std::char_traits<char>::length(interface_unique)) == 0) {
+    AddRef();
+    *out_interface = const_cast<EFSystemImpl*>(this);
+    return true;
+  }
+
   {
     base::AutoLock l(interface_factory_map_lock_);
     auto it = interface_factory_map_.find(std::string(interface_unique));
