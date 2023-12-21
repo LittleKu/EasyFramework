@@ -21,7 +21,7 @@ class EFThreadImpl : public ef::common::wrapper::BaseInterfaceImpl<IEFThread> {
   EFThreadImpl();
   ~EFThreadImpl() override;
 
-  DECLARE_INTERFACE_UNIQUE(IEFThread)
+  DECLARE_INTERFACE_UNIQUE(IEFThread);
 
  public:  // override IEFThread methods
   bool Start(const char* name, int message_type) override;

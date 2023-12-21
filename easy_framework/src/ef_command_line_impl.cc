@@ -11,6 +11,8 @@
 
 namespace ef {
 
+IMPL_INTERFACE_UNIQUE(EFCommandLineImpl, IEFCommandLine);
+
 EFCommandLineImpl::EFCommandLineImpl(base::CommandLine* command_line)
     : command_line_(command_line == nullptr
                         ? base::CommandLine(base::CommandLine::NO_PROGRAM)

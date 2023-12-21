@@ -14,6 +14,8 @@
 
 namespace ef {
 
+IMPL_INTERFACE_UNIQUE(EFMainUIMessageLoop, IEFMessageLoop)
+
 EFMainUIMessageLoop::EFMainUIMessageLoop()
     : owned_sequence_manager_(
           base::sequence_manager::CreateUnboundSequenceManager(

@@ -85,13 +85,14 @@ struct IWeakRef : public IRefBase {
   virtual bool Lock(IRefBase** strong_ptr) = 0;
 };
 
-#define DECLARE_INTERFACE_UNIQUE(UniqueType) \
- public:                                     \
-  const char* Unique() const override {      \
-    return #UniqueType;                      \
-  }                                          \
-                                             \
- private:
+#define DECLARE_INTERFACE_UNIQUE(ClassName) \
+ public:                                    \
+  const char* Unique() const override
+
+#define IMPL_INTERFACE_UNIQUE(ClassName, UniqueName) \
+  const char* ClassName::Unique() const {            \
+    return #UniqueName;                              \
+  }
 
 #define INTERFACE_UNIQUE(UniqueType) #UniqueType
 

@@ -23,7 +23,7 @@ class DefaultTaskRunner final
       scoped_refptr<base::SingleThreadTaskRunner> task_runner);
   ~DefaultTaskRunner() override;
 
-  DECLARE_INTERFACE_UNIQUE(IEFTaskRunner)
+  DECLARE_INTERFACE_UNIQUE(IEFTaskRunner);
 
  public:  // override ITaskRunner methods
   void PostTask(ITask* task) override;
@@ -34,7 +34,6 @@ class DefaultTaskRunner final
  private:
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_{nullptr};
 };
-
 
 }  // namespace ef
 #endif  // !EASY_FRAMEWORK_DEFAULT_TASK_RUNNER_H_

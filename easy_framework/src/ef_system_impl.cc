@@ -38,6 +38,7 @@ void StartThreadPool() {
 }
 
 }  // namespace
+IMPL_INTERFACE_UNIQUE(EFSystemImpl, IEFSystem)
 
 EFSystemImpl::EFSystemImpl()
     : at_exit_manager_(std::make_unique<base::AtExitManager>()),

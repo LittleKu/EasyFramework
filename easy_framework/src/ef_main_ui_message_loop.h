@@ -22,7 +22,7 @@ class EFMainUIMessageLoop final
   EFMainUIMessageLoop();
   ~EFMainUIMessageLoop() override;
 
-  DECLARE_INTERFACE_UNIQUE(IEFMessageLoop)
+  DECLARE_INTERFACE_UNIQUE(IEFMessageLoop);
 
  public:  // override IMessageLoop methods
   int Run() final;

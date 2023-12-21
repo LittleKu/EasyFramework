@@ -10,6 +10,8 @@
 
 namespace ef {
 
+IMPL_INTERFACE_UNIQUE(DefaultTaskRunner, IEFTaskRunner)
+
 DefaultTaskRunner::DefaultTaskRunner(
     scoped_refptr<base::SingleThreadTaskRunner> task_runner)
     : task_runner_{task_runner} {

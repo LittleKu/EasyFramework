@@ -35,6 +35,8 @@ base::MessagePumpType ToMessagePumpType(int message_type) {
 
 }  // namespace
 
+IMPL_INTERFACE_UNIQUE(EFThreadImpl, IEFThread)
+
 EFThreadImpl::EFThreadImpl() = default;
 
 EFThreadImpl::~EFThreadImpl() = default;
