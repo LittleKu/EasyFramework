@@ -15,6 +15,7 @@
 #include "easy_framework/include/ef_base.h"
 #include "easy_framework/include/ef_system.h"
 #include "easy_framework/include/win/ef_win.h"
+#include "easy_framework/plugins/include/ef_md5.h"
 
 #include <functional>
 
@@ -23,7 +24,7 @@ class TaskImpl : public ef::common::wrapper::RefBaseImpl<ITask> {
 
  public:
   explicit TaskImpl(const std::function<void()>& func) : m_func(func) {}
-  ~TaskImpl() override = default;
+  ~TaskImpl() override { LOG(INFO) << "~TaskImpl"; }
 
   void Run() override { m_func(); }
 };
@@ -50,7 +51,7 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
                    reinterpret_cast<IBaseInterface**>(sys.addressof()));
 
     if (sys) {
-      sys->Initialize(instance);
+      sys->Initialize(instance, nullptr);
 
       ef::common::EFRefPtr<IEFMessageLoop> main_loop = nullptr;
       sys->GetMainMessageLoop(main_loop.addressof());
@@ -58,8 +59,33 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, wchar_t*, int) {
       ef::common::EFRefPtr<IEFTaskRunner> main_task_runner = nullptr;
       main_loop->CreateTaskRunner(main_task_runner.addressof());
 
-      main_task_runner->PostDelayedTask(
-          new TaskImpl([main_loop] { main_loop->Quit(); }), 10000);
+      ef::common::EFRefPtr<IEFTaskRunner> thread_pool_task_runner = nullptr;
+      sys->CreateThreadPoolTaskRunner(thread_pool_task_runner.addressof());
+
+      thread_pool_task_runner->PostTaskAndReply(
+          new TaskImpl([s = ef::common::EFRefPtr<IEFSystem>(sys)] {
+            ef::common::EFRefPtr<IEFMessageDigest> message_digest = nullptr;
+            s->QueryInterface(
+                INTERFACE_UNIQUE(IEFMessageDigest),
+                reinterpret_cast<IBaseInterface**>(message_digest.addressof()));
+
+            ef::common::EFRefPtr<IEFStringUtf8> md5_string = nullptr;
+            std::string str = "1234567890abcdefghijklmnopqrstuvwxyz";
+            message_digest->Initialize();
+            message_digest->Update(str.c_str(), str.length());
+            message_digest->Final(md5_string.addressof());
+
+            ef::common::EFRefPtr<IEFStringWide> str_wide = nullptr;
+            md5_string->ToWide(str_wide.addressof());
+
+            LOG(INFO) << "md5_string :" << md5_string->String()
+                      << ",wide:" << str_wide->String();
+          }),
+          new TaskImpl([main_task_runner, main_loop] {
+            main_task_runner->PostDelayedTask(
+                new TaskImpl([main_loop] { main_loop->Quit(); }), 10000);
+          }));
+
       main_loop->Run();
 
       sys->Uninitialize();

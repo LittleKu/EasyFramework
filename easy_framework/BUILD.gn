@@ -46,7 +46,10 @@ if (is_mac) {
       "src/ef_thread_impl.h",
     ]
 
-    deps = [ "//base" ]
+    deps = [
+      "//base",
+      "//easy_framework/plugins:libtools",
+    ]
   }
 }
 
