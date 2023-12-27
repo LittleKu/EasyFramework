@@ -13,15 +13,15 @@
 #include "easy_framework/include/ef_message_loop.h"
 #include "easy_framework/include/ef_task_runner.h"
 
-
 struct IEFSystem : public IBaseInterface {
   /**
    * @brief not thread safe, must be called on the main thread
    *
    * @param instance process instance
+   * @param plugin_path plugin path
    * @return true on success, false on failure
    */
-  virtual bool Initialize(void* instance) = 0;
+  virtual bool Initialize(void* instance, const char* plugin_path) = 0;
 
   /**
    * @brief not thread safe, must be called on the main thread
@@ -71,6 +71,15 @@ struct IEFSystem : public IBaseInterface {
    * @return true on success, false on failure
    */
   virtual bool GetMainMessageLoop(IEFMessageLoop** out_message_loop) = 0;
+
+  /**
+   * @brief
+   *
+   * @param file_path
+   * @return true
+   * @return false
+   */
+  virtual bool LoadPluginManual(const char* file_path) = 0;
 };
 
 #endif  // !EASY_FRAMEWORK_SYSTEM_H_

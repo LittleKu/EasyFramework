@@ -57,7 +57,6 @@ bool EFMainUIMessageLoop::CreateTaskRunner(IEFTaskRunner** out_task_runner) {
           base::sequence_manager::kTaskTypeNone);
 
   auto* task_runner_wrapper = new ef::DefaultTaskRunner(task_runner);
-  task_runner_wrapper->ConnectInterface(this);
   task_runner_wrapper->AddRef();
   *out_task_runner = task_runner_wrapper;
   return true;

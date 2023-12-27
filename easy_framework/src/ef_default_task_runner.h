@@ -17,13 +17,11 @@ namespace ef {
 
 
 class DefaultTaskRunner final
-    : public ef::common::wrapper::BaseInterfaceImpl<IEFTaskRunner> {
+    : public ef::common::wrapper::RefBaseImpl<IEFTaskRunner> {
  public:
   explicit DefaultTaskRunner(
       scoped_refptr<base::SingleThreadTaskRunner> task_runner);
   ~DefaultTaskRunner() override;
-
-  DECLARE_INTERFACE_UNIQUE(IEFTaskRunner);
 
  public:  // override ITaskRunner methods
   void PostTask(ITask* task) override;

@@ -77,7 +77,6 @@ bool EFThreadImpl::GetTaskRunner(IEFTaskRunner** out_task_runner) {
     scoped_refptr<base::SingleThreadTaskRunner> task_runner =
         thread_->task_runner();
     auto* task_runner_wrapper = new ef::DefaultTaskRunner(task_runner);
-    task_runner_wrapper->ConnectInterface(this);
     task_runner_wrapper->AddRef();
     *out_task_runner = task_runner_wrapper;
     return true;

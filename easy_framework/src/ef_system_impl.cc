@@ -12,9 +12,13 @@
 
 #include "base/check_op.h"
 #include "base/command_line.h"
+#include "base/files/file_enumerator.h"
+#include "base/files/file_util.h"
+#include "base/path_service.h"
 #include "base/task/thread_pool.h"
 #include "base/task/thread_pool/initialization_util.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
+#include "base/threading/thread_restrictions.h"
 
 namespace ef {
 
@@ -37,7 +41,14 @@ void StartThreadPool() {
   base::ThreadPoolInstance::Get()->Start(thread_pool_init_params);
 }
 
+struct LibraryDeleter {
+  using pointer = base::NativeLibrary;
+  void operator()(base::NativeLibrary h) { base::UnloadNativeLibrary(h); }
+};
+
+constexpr wchar_t kPluginSubPath[] = FILE_PATH_LITERAL("plugin");
 }  // namespace
+
 IMPL_INTERFACE_UNIQUE(EFSystemImpl, IEFSystem)
 
 EFSystemImpl::EFSystemImpl()
@@ -50,6 +61,11 @@ EFSystemImpl::EFSystemImpl()
       INTERFACE_UNIQUE(IEFCommandLine));
   RegisterInterfaceFactoryInternal<IEFThread, EFThreadImpl>(
       INTERFACE_UNIQUE(IEFThread));
+
+  // default plugin path
+  base::FilePath current_path;
+  base::PathService::Get(base::DIR_MODULE, &current_path);
+  plugin_path_ = current_path.Append(kPluginSubPath);
 }
 
 EFSystemImpl::~EFSystemImpl() {
@@ -72,6 +88,22 @@ bool EFSystemImpl::QueryInterface(const char* interface_unique,
     return true;
   }
 
+  //first query plugins
+  {
+    base::AutoLock l(plugin_lock_);
+    for (const auto& plugin : plugins_) {
+      IBaseInterface* out = nullptr;
+      HRESULT hr =
+          plugin.second.get()->fnQueryInterface(interface_unique, &out);
+      if (hr == S_OK) {
+        out->ConnectInterface(this);
+        *out_interface = out;
+        return true;
+      }
+    }
+  }
+
+  //internal interface
   {
     base::AutoLock l(interface_factory_map_lock_);
     auto it = interface_factory_map_.find(std::string(interface_unique));
@@ -100,7 +132,7 @@ bool EFSystemImpl::ConnectInterface(IBaseInterface* host) {
   return false;
 }
 
-bool EFSystemImpl::Initialize(void* instance) {
+bool EFSystemImpl::Initialize(void* instance, const char* plugin_path) {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
 
   instance_ = reinterpret_cast<HINSTANCE>(instance);
@@ -110,11 +142,33 @@ bool EFSystemImpl::Initialize(void* instance) {
   base::ThreadPoolInstance::Create(INTERFACE_UNIQUE(IEFSystem));
   StartThreadPool();
 
-  return true;
+  if (plugin_path && std::char_traits<char>::length(plugin_path)) {
+    base::FilePath new_plugin_path =
+        base::FilePath::FromUTF8Unsafe(std::string(plugin_path));
+    base::ScopedAllowBlockingForTesting allow_io;
+    if (base::DirectoryExists(new_plugin_path)) {
+      plugin_path_ = new_plugin_path;
+    }
+  }
+
+  return LoadPlugins();
 }
 
 bool EFSystemImpl::Uninitialize() {
   DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
+
+  {
+    base::AutoLock l(plugin_lock_);
+    for (auto& plugin : plugins_) {
+      if (0 == plugin.second->fnCanUnloadPlugin()) {
+        base::UnloadNativeLibrary(plugin.second.get()->plugin);
+      } else {
+        DCHECK(false) << "plugin :" << plugin.second->file_path
+                      << " could not unload at the time";
+      }
+    }
+    plugins_.clear();
+  }
 
   base::ThreadPoolInstance::Get()->Shutdown();
 
@@ -134,7 +188,6 @@ bool EFSystemImpl::CreateThreadPoolTaskRunner(IEFTaskRunner** out_task_runner) {
         base::ThreadPool::CreateSingleThreadTaskRunner(
             {base::MayBlock(), base::TaskPriority::USER_VISIBLE}));
     task_runner->AddRef();
-    task_runner->ConnectInterface(this);
     *out_task_runner = task_runner;
     return true;
   }
@@ -197,6 +250,68 @@ bool EFSystemImpl::GetMainMessageLoop(IEFMessageLoop** out_message_loop) {
   main_message_loop_->AddRef();
   *out_message_loop = main_message_loop_.get();
   return true;
+}
+
+bool EFSystemImpl::LoadPluginManual(const char* file_path) {
+  if (!file_path || !std::char_traits<char>::length(file_path)) {
+    return false;
+  }
+
+  base::FilePath plugin_file_path =
+      base::FilePath::FromUTF8Unsafe(std::string(file_path));
+
+  return LoadPluginInternal(plugin_file_path);
+}
+
+bool EFSystemImpl::LoadPlugins() {
+  base::ScopedAllowBlockingForTesting allow_io;
+  DCHECK(base::DirectoryExists(plugin_path_));
+
+  base::FileEnumerator e(plugin_path_, false, base::FileEnumerator::FILES,
+                         FILE_PATH_LITERAL("*.dll"));
+  for (base::FilePath plugin_name = e.Next(); !plugin_name.empty();
+       plugin_name = e.Next()) {
+    LoadPluginInternal(plugin_name);
+  }
+  return true;
+}
+
+bool EFSystemImpl::LoadPluginInternal(const base::FilePath& file_path) {
+  base::ScopedAllowBlockingForTesting allow_io;
+  if (!base::PathExists(file_path)) {
+    return false;
+  }
+
+  base::NativeLibraryLoadError e;
+  std::unique_ptr<void, LibraryDeleter> plugin(
+      base::LoadNativeLibrary(file_path, &e));
+  if (!plugin.get()) {
+    return false;
+  }
+
+  auto* fnCanUnloadPlugin = reinterpret_cast<decltype(&::CanUnloadPlugin)>(
+      base::GetFunctionPointerFromNativeLibrary(
+          plugin.get(), PLUGIN_EXPORT_SYMBOL(CanUnloadPlugin)));
+  auto* fnQueryInterface = reinterpret_cast<decltype(&::QueryInterface)>(
+      base::GetFunctionPointerFromNativeLibrary(
+          plugin.get(), PLUGIN_EXPORT_SYMBOL(QueryInterface)));
+
+  if (fnCanUnloadPlugin == nullptr || fnQueryInterface == nullptr) {
+    return false;
+  }
+
+  {
+    base::AutoLock l(plugin_lock_);
+    if (plugins_.find(file_path) == plugins_.end()) {
+      auto p = std::make_unique<Plugin>();
+      p->file_path = file_path;
+      p->fnCanUnloadPlugin = fnCanUnloadPlugin;
+      p->fnQueryInterface = fnQueryInterface;
+      p->plugin = plugin.release();
+      plugins_.insert(std::make_pair(file_path, std::move(p)));
+    }
+  }
+  return false;
 }
 
 }  // namespace ef
