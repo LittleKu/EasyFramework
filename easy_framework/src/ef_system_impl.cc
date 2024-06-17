@@ -311,7 +311,7 @@ bool EFSystemImpl::LoadPluginInternal(const base::FilePath& file_path) {
       plugins_.insert(std::make_pair(file_path, std::move(p)));
     }
   }
-  return false;
+  return true;
 }
 
 }  // namespace ef
