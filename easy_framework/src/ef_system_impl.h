@@ -40,6 +40,7 @@ class EFSystemImpl final
   DECLARE_INTERFACE_UNIQUE(IEFSystem);
 
  public:  // override IBaseInterface method
+  unsigned int Version() const final;
   bool QueryInterface(const char* interface_unique,
                       IBaseInterface** out_interface) final;
   bool ConnectInterface(IBaseInterface* host) final;

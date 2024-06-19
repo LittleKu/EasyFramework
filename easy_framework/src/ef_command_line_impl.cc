@@ -20,6 +20,10 @@ EFCommandLineImpl::EFCommandLineImpl(base::CommandLine* command_line)
 
 EFCommandLineImpl::~EFCommandLineImpl() = default;
 
+unsigned int EFCommandLineImpl::Version() const {
+  return COMMAND_LINE_VERSION;
+}
+
 bool EFCommandLineImpl::CopyTo(IEFCommandLine** out_copy) {
   if (out_copy == nullptr) {
     return false;

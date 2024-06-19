@@ -41,6 +41,10 @@ EFThreadImpl::EFThreadImpl() = default;
 
 EFThreadImpl::~EFThreadImpl() = default;
 
+unsigned int EFThreadImpl::Version() const {
+  return THREAD_VERSION;
+}
+
 bool EFThreadImpl::Start(const char* name, int message_type) {
   if (name == nullptr || !std::char_traits<char>::length(name)) {
     return false;

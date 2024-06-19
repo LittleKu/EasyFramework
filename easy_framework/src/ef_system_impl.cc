@@ -73,6 +73,11 @@ EFSystemImpl::~EFSystemImpl() {
   at_exit_manager_.reset();
 }
 
+unsigned int EFSystemImpl::Version() const {
+  constexpr auto ver = SYSTEM_VERSION;
+  return ver;
+}
+
 bool EFSystemImpl::QueryInterface(const char* interface_unique,
                                   IBaseInterface** out_interface) {
   if (!interface_unique || !std::char_traits<char>::length(interface_unique) ||

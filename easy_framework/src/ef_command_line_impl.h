@@ -22,6 +22,8 @@ class EFCommandLineImpl
 
   DECLARE_INTERFACE_UNIQUE(IEFCommandLine);
 
+  unsigned int Version() const final;
+
  public:
   bool CopyTo(IEFCommandLine** out_copy) override;
   bool InitFromArgv(int argc, const char* const* argv) override;

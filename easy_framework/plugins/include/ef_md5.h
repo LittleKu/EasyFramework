@@ -10,6 +10,8 @@
 #include "easy_framework/include/ef_base.h"
 #include "easy_framework/plugins/include/ef_string.h"
 
+#define MD_VERSION MAKE_VERSION(1, 0, 0)
+
 struct IEFMessageDigest : public IBaseInterface {
   /**
    * @brief

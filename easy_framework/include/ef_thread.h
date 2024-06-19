@@ -10,6 +10,8 @@
 #include "easy_framework/include/ef_base.h"
 #include "easy_framework/include/ef_message_loop.h"
 
+#define THREAD_VERSION MAKE_VERSION(1, 0, 0)
+
 struct IEFThread : public IBaseInterface {
   /**
    * @brief

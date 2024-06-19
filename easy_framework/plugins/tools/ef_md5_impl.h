@@ -28,6 +28,8 @@ class EFMessageDigestImpl
 
   DECLARE_INTERFACE_UNIQUE(EFMessageDigestImpl);
 
+  unsigned int Version() const final;
+
  public:  // override IEFMessageDigest methods
   bool Initialize() override;
   bool Update(const void* data, size_t length) override;

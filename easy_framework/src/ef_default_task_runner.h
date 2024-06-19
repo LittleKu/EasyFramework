@@ -15,7 +15,6 @@
 
 namespace ef {
 
-
 class DefaultTaskRunner final
     : public ef::common::wrapper::RefBaseImpl<IEFTaskRunner> {
  public:

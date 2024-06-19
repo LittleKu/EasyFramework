@@ -24,6 +24,8 @@ class EFMainUIMessageLoop final
 
   DECLARE_INTERFACE_UNIQUE(IEFMessageLoop);
 
+  unsigned int Version() const final;
+
  public:  // override IMessageLoop methods
   int Run() final;
   void Quit() final;

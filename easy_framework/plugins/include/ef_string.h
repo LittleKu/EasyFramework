@@ -9,6 +9,8 @@
 
 #include "easy_framework/include/ef_base.h"
 
+#define STRING_FACTORY_VERSION MAKE_VERSION(1, 0, 0)
+
 typedef char utf8;
 
 struct IEFStringWide;

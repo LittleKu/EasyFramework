@@ -22,6 +22,10 @@ EFMessageDigestImpl::EFMessageDigestImpl() = default;
 
 EFMessageDigestImpl::~EFMessageDigestImpl() = default;
 
+unsigned int EFMessageDigestImpl::Version() const {
+  return MD_VERSION;
+}
+
 bool EFMessageDigestImpl::Initialize() {
   DCHECK(!initialized_);
   base::MD5Init(&ctx_);

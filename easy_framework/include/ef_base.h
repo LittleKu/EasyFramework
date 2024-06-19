@@ -42,6 +42,13 @@ struct IBaseInterface : public IRefBase {
   virtual const char* Unique() const = 0;
 
   /**
+   * @brief return the interface version
+   *
+   * @return unsigned int
+   */
+  virtual unsigned int Version() const = 0;
+
+  /**
    * @brief Query interface
    *
    * @param interface_unique interface unique identifier
@@ -69,8 +76,9 @@ struct IWeakRef : public IRefBase {
     // disable
     return false;
   }
+
   /**
-   * @brief Deteting the validity of the host pointer.
+   * @brief Detecting the validity of the host pointer.
    *
    * @return true on invalid, otherwise valid.
    */
@@ -95,6 +103,17 @@ struct IWeakRef : public IRefBase {
   }
 
 #define INTERFACE_UNIQUE(UniqueType) #UniqueType
+
+#define MAKE_16BIT(a, b) \
+  ((unsigned short)(((unsigned char)(((unsigned int)(a)) & 0xff)) | \
+  ((unsigned short)((unsigned char)(((unsigned int)(b)) & 0xff))) << 8))
+
+#define MAKE_32BIT(a, b) \
+((unsigned int)(((unsigned short)(((unsigned int)(a)) & 0xffff)) |  \
+((unsigned int)((unsigned short)(((unsigned int)(b)) & 0xffff))) << 16))
+
+#define MAKE_VERSION(major /* byte */, minor /* byte */, build /* short */) \
+  MAKE_32BIT(MAKE_16BIT(major, minor), build)
 
 #if defined(_WIN32)
 #include "easy_framework/include/win/ef_win.h"

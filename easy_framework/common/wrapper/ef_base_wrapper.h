@@ -28,12 +28,12 @@ class WeakReference final : public IWeakRef {
       : host_ptr_(host_ptr), ref_ptr_(ref_ptr) {
     ref_ptr_->AddRefWeak();
   }
-  virtual ~WeakReference() { ref_ptr_->ReleaseWeak(); }
+  ~WeakReference() { ref_ptr_->ReleaseWeak(); }
 
  public:  // override IWeakReft methods
-  void AddRef() const override { ref_count_.Increment(); }
+  void AddRef() const final { ref_count_.Increment(); }
 
-  bool Release() const override {
+  bool Release() const final {
     if (!ref_count_.Decrement()) {
       delete this;
       return true;
@@ -42,9 +42,9 @@ class WeakReference final : public IWeakRef {
     return false;
   }
 
-  bool Expired() const override { return !ref_ptr_->HasAtLeastOneRef(); }
+  bool Expired() const final { return !ref_ptr_->HasAtLeastOneRef(); }
 
-  bool Lock(IRefBase** strong_ptr) override {
+  bool Lock(IRefBase** strong_ptr) final {
     if (strong_ptr == nullptr) {
       return false;
     }

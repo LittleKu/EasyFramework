@@ -9,6 +9,8 @@
 
 #include "easy_framework/include/ef_base.h"
 
+#define COMMAND_LINE_VERSION MAKE_VERSION(1, 0, 1)
+
 struct IEFCommandLine : public IBaseInterface {
   /**
    * @brief

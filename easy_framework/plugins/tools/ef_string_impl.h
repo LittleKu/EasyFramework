@@ -72,6 +72,8 @@ class EFStringFactoryImpl
 
   DECLARE_INTERFACE_UNIQUE(IEFStringFactory);
 
+  unsigned int Version() const final;
+
  public:  // override IEFStringUtil methods
   bool AllocateUtf8(const utf8* str,
                     size_t length,

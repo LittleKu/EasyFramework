@@ -143,6 +143,10 @@ EFStringFactoryImpl::EFStringFactoryImpl() = default;
 
 EFStringFactoryImpl::~EFStringFactoryImpl() = default;
 
+unsigned int EFStringFactoryImpl::Version() const {
+  return STRING_FACTORY_VERSION;
+}
+
 bool EFStringFactoryImpl::AllocateUtf8(const utf8* str,
                                        size_t length,
                                        IEFStringUtf8** out_string) {

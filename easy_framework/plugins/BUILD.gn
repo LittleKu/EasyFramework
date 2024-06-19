@@ -14,9 +14,7 @@ shared_library("libtools") {
   ]
 
   if (is_win) {
-    sources += [
-      "tools/export.def"
-    ]
+    sources += [ "tools/export.def" ]
   }
 
   deps = [ "//base" ]

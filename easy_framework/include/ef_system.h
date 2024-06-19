@@ -13,6 +13,8 @@
 #include "easy_framework/include/ef_message_loop.h"
 #include "easy_framework/include/ef_task_runner.h"
 
+#define SYSTEM_VERSION MAKE_VERSION(1, 1, 1)
+
 struct IEFSystem : public IBaseInterface {
   /**
    * @brief not thread safe, must be called on the main thread

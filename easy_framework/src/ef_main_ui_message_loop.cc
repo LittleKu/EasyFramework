@@ -33,6 +33,10 @@ EFMainUIMessageLoop::EFMainUIMessageLoop()
 
 EFMainUIMessageLoop::~EFMainUIMessageLoop() = default;
 
+unsigned int EFMainUIMessageLoop::Version() const {
+  return MESSAGE_LOOP_VERSION;
+}
+
 int EFMainUIMessageLoop::Run() {
   base::RunLoop loop;
   quit_when_idle_closure_ = loop.QuitWhenIdleClosure();
