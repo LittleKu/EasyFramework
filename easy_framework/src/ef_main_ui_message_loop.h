@@ -13,6 +13,8 @@
 #include "easy_framework/common/wrapper/ef_base_interface_wrapper.h"
 #include "easy_framework/include/ef_message_loop.h"
 
+#include <stack>
+
 namespace ef {
 
 
@@ -37,7 +39,7 @@ class EFMainUIMessageLoop final
   std::unique_ptr<base::sequence_manager::SequenceManager>
       owned_sequence_manager_{nullptr};
   base::sequence_manager::TaskQueue::Handle default_task_queue_;
-  base::OnceClosure quit_when_idle_closure_;
+  std::stack<base::OnceClosure> stack_quit_when_idle_closure_;
 };
 
 }  // namespace ef

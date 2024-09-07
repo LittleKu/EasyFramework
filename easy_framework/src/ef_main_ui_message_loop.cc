@@ -38,15 +38,18 @@ unsigned int EFMainUIMessageLoop::Version() const {
 }
 
 int EFMainUIMessageLoop::Run() {
-  base::RunLoop loop;
-  quit_when_idle_closure_ = loop.QuitWhenIdleClosure();
+  base::RunLoop loop(base::RunLoop::Type::kNestableTasksAllowed);
+  stack_quit_when_idle_closure_.push(loop.QuitWhenIdleClosure());
   loop.Run();
   return 0;
 }
 
 void EFMainUIMessageLoop::Quit() {
-  if (!quit_when_idle_closure_.is_null()) {
-    std::move(quit_when_idle_closure_).Run();
+  if (!stack_quit_when_idle_closure_.empty()) {
+    auto quit_when_idle_closure =
+        std::move(stack_quit_when_idle_closure_.top());
+    stack_quit_when_idle_closure_.pop();
+    std::move(quit_when_idle_closure).Run();
   }
 }
 
@@ -71,6 +74,6 @@ int EFMainUIMessageLoop::Type() const {
 }
 
 bool EFMainUIMessageLoop::IsRunning() const {
-  return !quit_when_idle_closure_.is_null();
+  return !stack_quit_when_idle_closure_.empty();
 }
 }  // namespace ef
