@@ -9,9 +9,9 @@ source_set("include") {
   sources = [ "include/libef.h" ]
 }
 
-group("eframework") {
+group("framework") {
   public_deps = [
-    "//libef/eframework:libef",
+    "//libef/framework:libef",
     "//libef/example:example",
   ]
 }
