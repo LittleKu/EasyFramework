@@ -1,0 +1,24 @@
+import("//base.gni")
+
+config("libef_cfg") {
+  cflags = []
+  defines = [ "FRAMEWORK_IMPLEMENTATION" ]
+  if (is_clang) {
+    cflags += [ "-Wno-undef" ]
+  }
+}
+
+base_shared_library("libef") {
+  sources = [
+    "src/libef.cc",
+    "src/framework.cc",
+    "src/framework.h"
+  ]
+
+  deps = [
+    "//base",
+    "//libef:include",
+  ]
+
+  configs += [ ":libef_cfg" ]
+}
