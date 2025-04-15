@@ -15,17 +15,33 @@
 
 #include "base/at_exit.h"
 #include "base/command_line.h"
+#include "base/native_library.h"
+#include "base/path_service.h"
+#include "base/files/file_path.h"
 
 #if BUILDFLAG(IS_WIN)
+
+#define EXTENSION ".dll"
+
 int WINAPI wWinMain(HINSTANCE instance,
                     HINSTANCE prev,
                     wchar_t* cmd,
                     int show) {
   base::CommandLine::Init(0, nullptr);
 #elif BUILDFLAG(IS_LINUX)
+
+#define EXTENSION ".so"
+
 int main(int argc, char* argv[]) {
   base::CommandLine::Init(argc, argv);
 #endif
   base::AtExitManager exit_manager;
+  base::FilePath lib_path;
+  base::PathService::Get(base::DIR_EXE, &lib_path);
+  lib_path = lib_path.AppendASCII("libef").AddExtensionASCII(EXTENSION);
+  base::NativeLibrary lib = base::LoadNativeLibrary(lib_path, nullptr);
+  if (lib != nullptr) {
+    base::UnloadNativeLibrary(lib);
+  }
   return 0;
 }

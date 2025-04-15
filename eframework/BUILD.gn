@@ -1,17 +1,19 @@
 import("//base.gni")
 
 config("eframework_config") {
-  include_dirs = [
-    "//libef/include"
-  ]
+  defines = [ "FRAMEWORK_IMPLEMENTATION" ]
 }
+
 base_shared_library("libef") {
   sources = [
     "src/eframework.cc",
     "src/eframework.h",
   ]
 
-  deps = [ "//base" ]
+  deps = [
+    "//base",
+    "//libef:include",
+  ]
 
   configs += [ ":eframework_config" ]
 }

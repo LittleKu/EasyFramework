@@ -7,7 +7,7 @@
 #include "libef/eframework/src/eframework.h"
 
 #include "build/build_config.h"
-#include "libef/include/exports.h"
+#include "libef/include/libef.h"
 
 
 #if BUILDFLAG(IS_WIN)
@@ -24,3 +24,8 @@ BOOL APIENTRY DllMain(HMODULE module,
 #elif BUILDFLAG(IS_LINUX)
 
 #endif
+
+FRAMEWORK_EXPORT bool QueryInterface(/*[in]*/ const char* interface_name,
+                                     /*[out]*/ void** interface) {
+  return false;
+}

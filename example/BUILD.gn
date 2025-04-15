@@ -3,10 +3,12 @@ import("//base.gni")
 executable("example") {
   deps = [
     "//base",
+    "//libef:include",
     "//libef/eframework:libef",
   ]
 
   sources = [ "example.cc" ]
 
   configs += [ "//build/config/win:windowed" ]
+  configs -= [ "//build/config/win:console" ]
 }
