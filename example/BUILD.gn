@@ -1,0 +1,12 @@
+import("//base.gni")
+
+executable("example") {
+  deps = [
+    "//base",
+    "//libef/eframework:libef",
+  ]
+
+  sources = [ "example.cc" ]
+
+  configs += [ "//build/config/win:windowed" ]
+}
