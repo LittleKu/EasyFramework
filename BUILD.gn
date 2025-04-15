@@ -1,6 +1,8 @@
-import("//common.gni")
+import("//base.gni")
 
-group("default") {
-  testonly = true
-  deps = [ "//easy_framework" ]
+group("eframework") {
+  public_deps = [
+    "//libef/eframework:libef",
+    "//libef/example:example",
+  ]
 }
