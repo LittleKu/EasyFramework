@@ -1,5 +1,14 @@
 import("//base.gni")
 
+config("include_config") {
+  include_dirs = [ "//libef/include" ]
+}
+
+source_set("include") {
+  public_configs = [ ":include_config" ]
+  sources = [ "include/libef.h" ]
+}
+
 group("eframework") {
   public_deps = [
     "//libef/eframework:libef",
