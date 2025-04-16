@@ -30,11 +30,14 @@ class FrameworkImpl : public BaseRefImpl<Framework> {
 
  public: /* override BaseInterface */
   bool QueryInterface(const char* interface_name, void** interface) override;
-  unsigned int GetVersion() override;
+  unsigned int GetVersion() const override;
 
  public:
   bool Initialize(void* instance) override;
   void UnInitialize() override;
+  bool CreateMessageLoop(bool nestable,
+                         MessageLoopType type,
+                         MessageLoop** loop) override;
 
  private:
   std::atomic_bool initialized_{false};

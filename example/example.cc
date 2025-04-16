@@ -18,6 +18,7 @@
 #include "base/native_library.h"
 #include "base/path_service.h"
 #include "base/files/file_path.h"
+#include "libef/include/libef.h"
 
 #if BUILDFLAG(IS_WIN)
 
@@ -41,7 +42,20 @@ int main(int argc, char* argv[]) {
   lib_path = lib_path.AppendASCII("libef").AddExtensionASCII(EXTENSION);
   base::NativeLibrary lib = base::LoadNativeLibrary(lib_path, nullptr);
   if (lib != nullptr) {
+    auto query_interface = reinterpret_cast<decltype(&QueryInterface)>(
+        base::GetFunctionPointerFromNativeLibrary(lib, "QueryInterface"));
+    if (query_interface != nullptr) {
+      Framework* framework = nullptr;
+      query_interface(FRAMEWORK_NAME, reinterpret_cast<void**>(&framework));
+      if (framework != nullptr) {
+        framework->Initialize(instance);
+        // Begin main loop
+        framework->UnInitialize();
+        framework->Release();
+      }
+    }
     base::UnloadNativeLibrary(lib);
+
   }
   return 0;
 }

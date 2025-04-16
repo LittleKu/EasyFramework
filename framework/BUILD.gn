@@ -10,9 +10,13 @@ config("libef_cfg") {
 
 base_shared_library("libef") {
   sources = [
-    "src/libef.cc",
     "src/framework.cc",
-    "src/framework.h"
+    "src/framework.h",
+    "src/libef.cc",
+    "src/messageloop.cc",
+    "src/messageloop.h",
+    "src/taskrunner.cc",
+    "src/taskrunner.h",
   ]
 
   deps = [

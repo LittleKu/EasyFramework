@@ -28,7 +28,7 @@ bool FrameworkImpl::QueryInterface(const char* interface_name,
   return false;
 }
 
-unsigned int FrameworkImpl::GetVersion() {
+unsigned int FrameworkImpl::GetVersion() const {
   return FRAMEWORK_VERSION;
 }
 
@@ -46,6 +46,12 @@ void FrameworkImpl::UnInitialize() {
     instance_ = nullptr;
     initialized_.store(false);
   }
+}
+
+bool FrameworkImpl::CreateMessageLoop(bool nestable,
+                                      MessageLoopType type,
+                                      MessageLoop** loop) {
+  return false;
 }
 
 }  // namespace libef
