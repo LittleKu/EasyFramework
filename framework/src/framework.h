@@ -11,6 +11,8 @@
 
 #include "libef/wrapper/ref_impl.h"
 
+#include "base/at_exit.h"
+
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
 using Instance = HINSTANCE;
@@ -46,6 +48,7 @@ class FrameworkImpl : public BaseRefImpl<Framework> {
 #elif BUILDFLAG(IS_LINUX)
 
 #endif
+  std::unique_ptr<base::AtExitManager> at_exit_manager_;
 };
 
 }  // namespace libef

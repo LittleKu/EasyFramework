@@ -15,10 +15,26 @@
 
 #include "base/at_exit.h"
 #include "base/command_line.h"
+#include "base/functional/callback.h"
 #include "base/native_library.h"
 #include "base/path_service.h"
 #include "base/files/file_path.h"
 #include "libef/include/libef.h"
+#include "libef/wrapper/ref_impl.h"
+
+class TaskImpl : public libef::BaseRefImpl<Task> {
+ public:
+  explicit TaskImpl(base::OnceClosure task) : task_(std::move(task)) {}
+
+  void Run() override {
+    if (!task_.is_null()) {
+      std::move(task_).Run();
+    }
+  }
+
+ private:
+  base::OnceClosure task_;
+};
 
 #if BUILDFLAG(IS_WIN)
 
@@ -50,6 +66,25 @@ int main(int argc, char* argv[]) {
       if (framework != nullptr) {
         framework->Initialize(instance);
         // Begin main loop
+
+        {
+          MessageLoop *message_loop = nullptr;
+          framework->CreateMessageLoop(
+              true, MessageLoopType::kMessageLoopTypeUI, &message_loop);
+
+
+          TaskRunner* task_runner = nullptr;
+          message_loop->QueryInterface(TASK_RUNNER_NAME, reinterpret_cast<void**>(&task_runner));
+          task_runner->PostDelayedTask(
+              new TaskImpl(base::BindOnce(
+                  [](scoped_refptr<MessageLoop> l) { l->Quit(); },
+                  scoped_refptr<MessageLoop>(message_loop))),
+              5000ULL);
+
+          message_loop->Run();
+          task_runner->Release();
+          message_loop->Release();
+        }
         framework->UnInitialize();
         framework->Release();
       }
