@@ -49,7 +49,37 @@ class BaseInterface : public BaseRef {
    * 
    * \return 接口版本号
    */
-  virtual unsigned int GetVersion() = 0;
+  virtual unsigned int GetVersion() const = 0;
+};
+
+class Task : public BaseRef {
+ public:
+  virtual void Run() = 0;
+};
+
+#define TASK_RUNNER_NAME "ITaskRunnerV1"
+class TaskRunner : public BaseRef {
+ public:
+  virtual bool IsInCurrentThread() const = 0;
+  virtual void PostTask(Task* task) = 0;
+  virtual void PostDelayedTask(Task* task, unsigned long long delay_ms) = 0;
+};
+
+#define MESSAGE_LOOP_NAME "IMessageLoopV1"
+#define MESSAGE_LOOP_VERSION 1
+
+enum class MessageLoopType {
+  kMessageLoopTypeUI = 0,
+  kMessageLoopTypeIO,
+  kMessageLoopTypeDefault,
+};
+
+class MessageLoop : public BaseInterface {
+ public:
+  virtual int Run() = 0;
+  virtual void Quit() = 0;
+  virtual MessageLoopType GetType() = 0;
+  virtual bool IsNestable() const = 0;
 };
 
 #define FRAMEWORK_NAME "IFrameworkV1"
@@ -58,6 +88,9 @@ class Framework : public BaseInterface {
  public:
   virtual bool Initialize(void* instance) = 0;
   virtual void UnInitialize() = 0;
+  virtual bool CreateMessageLoop(bool nestable,
+                                 MessageLoopType type,
+                                 MessageLoop** loop) = 0;
 };
 
 #endif /* __LIBEF_H__ */

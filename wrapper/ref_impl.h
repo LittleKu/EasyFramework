@@ -37,13 +37,12 @@ class BaseRefImpl : public T {
     if (ref_count_.fetch_sub(1, std::memory_order_acq_rel) != 1) {
       return false;
     }
-
     delete this;
     return true;
   }
 
  protected:
-  mutable std::atomic_int ref_count_ = 1;
+  mutable std::atomic_int ref_count_{0};
 };
 
 }  // namespace libef
