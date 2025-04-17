@@ -21,6 +21,7 @@
 #include "base/files/file_path.h"
 #include "libef/include/libef.h"
 #include "libef/wrapper/ref_impl.h"
+#include "libef/wrapper/ref_ptr.h"
 
 class TaskImpl : public libef::BaseRefImpl<ITask> {
  public:
@@ -61,36 +62,31 @@ int main(int argc, char* argv[]) {
     auto query_interface = reinterpret_cast<decltype(&QueryInterface)>(
         base::GetFunctionPointerFromNativeLibrary(lib, "QueryInterface"));
     if (query_interface != nullptr) {
-      IFramework* interface = nullptr;
-      if (query_interface(FRAMEWORK_NAME, &interface)) {
-        IFramework* framework = reinterpret_cast<IFramework*>(interface);
+      libef::ref_ptr<IFramework> framework = nullptr;
+      if (query_interface(FRAMEWORK_NAME, reinterpret_cast<void**>(framework.addressof()))) {
         framework->Initialize(instance);
         // Begin main loop
 
         {
-          IMessageLoop* message_loop = nullptr;
+          libef::ref_ptr<IMessageLoop> message_loop = nullptr;
           framework->CreateMessageLoop(
-              true, MessageLoopType::kMessageLoopTypeUI, &message_loop);
+              true, MessageLoopType::kMessageLoopTypeUI, message_loop.addressof());
 
-          ITaskRunner* task_runner = nullptr;
+          libef::ref_ptr<ITaskRunner> task_runner = nullptr;
           message_loop->QueryInterface(TASK_RUNNER_NAME,
-                                       reinterpret_cast<void**>(&task_runner));
+                                       reinterpret_cast<void**>(task_runner.addressof()));
           task_runner->PostDelayedTask(
               new TaskImpl(base::BindOnce(
-                  [](scoped_refptr<IMessageLoop> l) { l->Quit(); },
-                  scoped_refptr<IMessageLoop>(message_loop))),
+                  [](libef::ref_ptr<IMessageLoop> l) { l->Quit(); },
+                  libef::ref_ptr<IMessageLoop>(message_loop))),
               5000ULL);
 
           message_loop->Run();
-          task_runner->Release();
-          message_loop->Release();
         }
         framework->UnInitialize();
-        framework->Release();
       }
     }
     base::UnloadNativeLibrary(lib);
-
   }
   return 0;
 }
