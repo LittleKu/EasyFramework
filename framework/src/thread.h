@@ -37,6 +37,7 @@ class ThreadImpl : public BaseRefImpl<IThread> {
   void Stop() override;
   bool IsRunning() const override;
   const char* GetName() const override;
+  ThreadId GetThreadId() const override;
   bool GetTaskRunner(ITaskRunner** task_runner) const override;
 
  private:

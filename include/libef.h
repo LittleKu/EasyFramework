@@ -13,13 +13,14 @@
 #else
 #define FRAMEWORK_EXPORT __declspec(dllimport)
 #endif
-
+#include <wtypes.h> // for DWORD
 #elif defined(__linux__)
 #if defined(FRAMEWORK_IMPLEMENTATION)
 #define FRAMEWORK_EXPORT __attribute__((visibility("default")))
 #else
 #define FRAMEWORK_EXPORT
 #endif
+#include <pthread.h>  //for pid_t
 #else
 #define FRAMEWORK_EXPORT
 #endif
@@ -38,7 +39,7 @@ class IBaseInterface : public IBaseRef {
  public:
   /**
    * \brief 通过接口名称获取指定接口实例对象
-   * 
+   *
    * \param interface_name 接口名称
    * \param interface 接口实例对象
    * \return true 获取成功,false 获取失败
@@ -46,7 +47,7 @@ class IBaseInterface : public IBaseRef {
   virtual bool QueryInterface(const char* interface_name, void** interface) = 0;
   /**
    * \brief 获取对应接口版本号.
-   * 
+   *
    * \return 接口版本号
    */
   virtual unsigned int GetVersion() const = 0;
@@ -82,12 +83,26 @@ class IMessageLoop : public IBaseInterface {
   virtual bool IsNestable() const = 0;
 };
 
+#if defined(_WIN32)
+using ThreadId = DWORD;
+#elif defined(__linux__)
+using ThreadId = pid_t;
+#endif
+
 class IThread : public IBaseRef {
  public:
   virtual void Start() = 0;
   virtual void Stop() = 0;
   virtual bool IsRunning() const = 0;
   virtual const char* GetName() const = 0;
+  /**
+   * \brief Get thread id.
+   * Note: If the thread is not started,
+   * it will wait until the thread is run and then return the ID of this thread
+   *
+   * \return thread id
+   */
+  virtual ThreadId GetThreadId() const = 0;
   virtual bool GetTaskRunner(ITaskRunner** runner) const = 0;
 };
 

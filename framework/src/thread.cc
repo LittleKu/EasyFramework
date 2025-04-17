@@ -38,6 +38,10 @@ const char* ThreadImpl::GetName() const {
   return thread_->thread_name().c_str();
 }
 
+ThreadId ThreadImpl::GetThreadId() const {
+  return thread_->GetThreadId();
+}
+
 bool ThreadImpl::GetTaskRunner(ITaskRunner** runner) const {
   if (runner == nullptr || thread_->task_runner() == nullptr) {
     return false;
