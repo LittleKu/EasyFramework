@@ -22,7 +22,7 @@
 #include "libef/include/libef.h"
 #include "libef/wrapper/ref_impl.h"
 
-class TaskImpl : public libef::BaseRefImpl<Task> {
+class TaskImpl : public libef::BaseRefImpl<ITask> {
  public:
   explicit TaskImpl(base::OnceClosure task) : task_(std::move(task)) {}
 
@@ -61,24 +61,24 @@ int main(int argc, char* argv[]) {
     auto query_interface = reinterpret_cast<decltype(&QueryInterface)>(
         base::GetFunctionPointerFromNativeLibrary(lib, "QueryInterface"));
     if (query_interface != nullptr) {
-      Framework* framework = nullptr;
-      query_interface(FRAMEWORK_NAME, reinterpret_cast<void**>(&framework));
-      if (framework != nullptr) {
+      IFramework* interface = nullptr;
+      if (query_interface(FRAMEWORK_NAME, &interface)) {
+        IFramework* framework = reinterpret_cast<IFramework*>(interface);
         framework->Initialize(instance);
         // Begin main loop
 
         {
-          MessageLoop *message_loop = nullptr;
+          IMessageLoop* message_loop = nullptr;
           framework->CreateMessageLoop(
               true, MessageLoopType::kMessageLoopTypeUI, &message_loop);
 
-
-          TaskRunner* task_runner = nullptr;
-          message_loop->QueryInterface(TASK_RUNNER_NAME, reinterpret_cast<void**>(&task_runner));
+          ITaskRunner* task_runner = nullptr;
+          message_loop->QueryInterface(TASK_RUNNER_NAME,
+                                       reinterpret_cast<void**>(&task_runner));
           task_runner->PostDelayedTask(
               new TaskImpl(base::BindOnce(
-                  [](scoped_refptr<MessageLoop> l) { l->Quit(); },
-                  scoped_refptr<MessageLoop>(message_loop))),
+                  [](scoped_refptr<IMessageLoop> l) { l->Quit(); },
+                  scoped_refptr<IMessageLoop>(message_loop))),
               5000ULL);
 
           message_loop->Run();

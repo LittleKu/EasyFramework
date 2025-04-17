@@ -15,16 +15,16 @@
 namespace libef {
 
 template <typename T>
-concept IsRefType = requires(T& t) {
+concept HasRefType = requires(T& t) {
   t.AddRef();
   t.Release();
 };
 
 template <typename T>
-concept IsBaseOfRefType = std::is_base_of_v<BaseRef, T>;
+concept IsBaseOfRefType = std::is_base_of_v<IBaseRef, T>;
 
 template <typename T>
-requires IsBaseOfRefType<T>
+  requires IsBaseOfRefType<T>
 class BaseRefImpl : public T {
  public:
   virtual ~BaseRefImpl() = default;

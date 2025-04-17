@@ -17,6 +17,8 @@ base_shared_library("libef") {
     "src/messageloop.h",
     "src/taskrunner.cc",
     "src/taskrunner.h",
+    "src/thread.cc",
+    "src/thread.h",
   ]
 
   deps = [

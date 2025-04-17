@@ -25,7 +25,7 @@ class SequenceManager;
 
 namespace libef {
 
-class MessageLoopImpl : public BaseRefImpl<MessageLoop> {
+class MessageLoopImpl : public BaseRefImpl<IMessageLoop> {
  public:
   explicit MessageLoopImpl(
       base::MessagePumpType pump_type = base::MessagePumpType::DEFAULT,
@@ -53,4 +53,4 @@ class MessageLoopImpl : public BaseRefImpl<MessageLoop> {
 
 }  // namespace libef
 
-#endif // LIBEF_FRAMEWORK_SRC_MESSAGELOOP_H
+#endif  // LIBEF_FRAMEWORK_SRC_MESSAGELOOP_H

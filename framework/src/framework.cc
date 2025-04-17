@@ -6,6 +6,7 @@
  */
 #include "libef/framework/src/framework.h"
 #include "libef/framework/src/messageloop.h"
+#include "libef/framework/src/thread.h"
 
 #include "base/check_op.h"
 
@@ -71,7 +72,7 @@ void FrameworkImpl::UnInitialize() {
 
 bool FrameworkImpl::CreateMessageLoop(bool nestable,
                                       MessageLoopType type,
-                                      MessageLoop** loop) {
+                                      IMessageLoop** loop) {
   if (loop == nullptr) {
     return false;
   }
@@ -85,6 +86,18 @@ bool FrameworkImpl::CreateMessageLoop(bool nestable,
   }
   message_loop->AddRef();
   *loop = message_loop;
+  return true;
+}
+
+bool FrameworkImpl::CreateThread(MessageLoopType type,
+                                 const char* name,
+                                 IThread** thread) {
+  if (thread == nullptr) {
+    return false;
+  }
+  auto *t = new ThreadImpl(MessageLoopTypeToMessagePumpType(type), name);
+  t->AddRef();
+  *thread = t;
   return true;
 }
 

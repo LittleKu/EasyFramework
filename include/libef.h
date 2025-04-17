@@ -27,14 +27,14 @@ extern "C" FRAMEWORK_EXPORT bool QueryInterface(
     /*[in]*/ const char* interface_name,
     /*[out]*/ void** interface);
 
-class BaseRef {
+class IBaseRef {
  public:
-  virtual ~BaseRef() {}
+  virtual ~IBaseRef() {}
   virtual void AddRef() const = 0;
   virtual bool Release() const = 0;
 };
 
-class BaseInterface : public BaseRef {
+class IBaseInterface : public IBaseRef {
  public:
   /**
    * \brief 通过接口名称获取指定接口实例对象
@@ -52,17 +52,17 @@ class BaseInterface : public BaseRef {
   virtual unsigned int GetVersion() const = 0;
 };
 
-class Task : public BaseRef {
+class ITask : public IBaseRef {
  public:
   virtual void Run() = 0;
 };
 
 #define TASK_RUNNER_NAME "ITaskRunnerV1"
-class TaskRunner : public BaseRef {
+class ITaskRunner : public IBaseRef {
  public:
   virtual bool IsInCurrentThread() const = 0;
-  virtual void PostTask(Task* task) = 0;
-  virtual void PostDelayedTask(Task* task, unsigned long long delay_ms) = 0;
+  virtual void PostTask(ITask* task) = 0;
+  virtual void PostDelayedTask(ITask* task, unsigned long long delay_ms) = 0;
 };
 
 #define MESSAGE_LOOP_NAME "IMessageLoopV1"
@@ -74,7 +74,7 @@ enum class MessageLoopType {
   kMessageLoopTypeDefault,
 };
 
-class MessageLoop : public BaseInterface {
+class IMessageLoop : public IBaseInterface {
  public:
   virtual int Run() = 0;
   virtual void Quit() = 0;
@@ -82,15 +82,27 @@ class MessageLoop : public BaseInterface {
   virtual bool IsNestable() const = 0;
 };
 
+class IThread : public IBaseRef {
+ public:
+  virtual void Start() = 0;
+  virtual void Stop() = 0;
+  virtual bool IsRunning() const = 0;
+  virtual const char* GetName() const = 0;
+  virtual bool GetTaskRunner(ITaskRunner** runner) const = 0;
+};
+
 #define FRAMEWORK_NAME "IFrameworkV1"
 #define FRAMEWORK_VERSION 1
-class Framework : public BaseInterface {
+class IFramework : public IBaseInterface {
  public:
   virtual bool Initialize(void* instance) = 0;
   virtual void UnInitialize() = 0;
   virtual bool CreateMessageLoop(bool nestable,
                                  MessageLoopType type,
-                                 MessageLoop** loop) = 0;
+                                 IMessageLoop** loop) = 0;
+  virtual bool CreateThread(MessageLoopType type,
+                            const char* name,
+                            IThread** thread) = 0;
 };
 
 #endif /* __LIBEF_H__ */

@@ -25,7 +25,7 @@ using Instance = void*;
 
 namespace libef {
 
-class FrameworkImpl : public BaseRefImpl<Framework> {
+class FrameworkImpl : public BaseRefImpl<IFramework> {
  public:
   FrameworkImpl();
   ~FrameworkImpl() override;
@@ -39,7 +39,10 @@ class FrameworkImpl : public BaseRefImpl<Framework> {
   void UnInitialize() override;
   bool CreateMessageLoop(bool nestable,
                          MessageLoopType type,
-                         MessageLoop** loop) override;
+                         IMessageLoop** loop) override;
+  bool CreateThread(MessageLoopType type,
+                    const char* name,
+                    IThread** thread) override;
 
  private:
   std::atomic_bool initialized_{false};

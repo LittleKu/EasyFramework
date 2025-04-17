@@ -14,15 +14,15 @@
 
 namespace libef {
 
-class TaskRunnerImpl : public BaseRefImpl<TaskRunner> {
+class TaskRunnerImpl : public BaseRefImpl<ITaskRunner> {
  public:
   explicit TaskRunnerImpl(scoped_refptr<base::SingleThreadTaskRunner> task_runner);
   ~TaskRunnerImpl() override;
 
  public:  // override TaskRunner
   bool IsInCurrentThread() const override;
-  void PostTask(Task* task) override;
-  void PostDelayedTask(Task* task, unsigned long long delay_ms) override;
+  void PostTask(ITask* task) override;
+  void PostDelayedTask(ITask* task, unsigned long long delay_ms) override;
 
  private:
   scoped_refptr<base::SingleThreadTaskRunner> task_runner_;

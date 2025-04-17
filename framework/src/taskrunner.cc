@@ -18,14 +18,14 @@ bool TaskRunnerImpl::IsInCurrentThread() const {
   return task_runner_->BelongsToCurrentThread();
 }
 
-void TaskRunnerImpl::PostTask(Task* task) {
+void TaskRunnerImpl::PostTask(ITask* task) {
   task_runner_->PostTask(
-      FROM_HERE, base::BindOnce(&Task::Run, scoped_refptr<Task>(task)));
+      FROM_HERE, base::BindOnce(&ITask::Run, scoped_refptr<ITask>(task)));
 }
 
-void TaskRunnerImpl::PostDelayedTask(Task* task, unsigned long long delay_ms) {
+void TaskRunnerImpl::PostDelayedTask(ITask* task, unsigned long long delay_ms) {
   task_runner_->PostDelayedTask(
-      FROM_HERE, base::BindOnce(&Task::Run, scoped_refptr<Task>(task)),
+      FROM_HERE, base::BindOnce(&ITask::Run, scoped_refptr<ITask>(task)),
       base::Milliseconds(delay_ms));
 }
 
