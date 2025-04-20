@@ -6,9 +6,13 @@
  */
 #include "libef/framework/src/framework.h"
 #include "libef/framework/src/messageloop.h"
+#include "libef/framework/src/taskrunner.h"
 #include "libef/framework/src/thread.h"
 
 #include "base/check_op.h"
+#include "base/task/task_traits.h"
+#include "base/task/thread_pool.h"
+#include "base/task/thread_pool/thread_pool_instance.h"
 
 #include <string>
 
@@ -52,11 +56,15 @@ unsigned int FrameworkImpl::GetVersion() const {
   return FRAMEWORK_VERSION;
 }
 
-bool FrameworkImpl::Initialize(void* instance) {
+bool FrameworkImpl::Initialize(void* instance, bool create_thread_pool) {
   if (initialized_.load() == false) {
     at_exit_manager_ = std::make_unique<base::AtExitManager>();
     instance_ = reinterpret_cast<Instance>(instance);
     initialized_.store(true);
+
+    if ((create_thread_pool_ = create_thread_pool)) {
+        base::ThreadPoolInstance::CreateAndStartWithDefaultParams("Easy_Framework");
+    }
     return true;
   }
   return false;
@@ -64,6 +72,9 @@ bool FrameworkImpl::Initialize(void* instance) {
 
 void FrameworkImpl::UnInitialize() {
   if (initialized_.load() == true) {
+    if (create_thread_pool_) {
+      base::ThreadPoolInstance::Get()->Shutdown();
+    }
     at_exit_manager_.reset();
     instance_ = nullptr;
     initialized_.store(false);
@@ -99,6 +110,24 @@ bool FrameworkImpl::CreateThread(MessageLoopType type,
   t->AddRef();
   *thread = t;
   return true;
+}
+
+bool FrameworkImpl::CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,ITaskRunner** task_runner) {
+  if (create_thread_pool_) {
+    if (task_runner == nullptr) {
+      return false;
+    }
+    scoped_refptr<base::SingleThreadTaskRunner> runner =
+        base::ThreadPool::CreateSingleThreadTaskRunner(
+            {base::MayBlock()},
+            static_cast<base::SingleThreadTaskRunnerThreadMode>(mode));
+    if (runner) {
+      *task_runner = new TaskRunnerImpl(runner);
+      (*task_runner)->AddRef();
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace libef

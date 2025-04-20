@@ -13,7 +13,7 @@
 #else
 #define FRAMEWORK_EXPORT __declspec(dllimport)
 #endif
-#include <wtypes.h> // for DWORD
+#include <wtypes.h>  // for DWORD
 #elif defined(__linux__)
 #if defined(FRAMEWORK_IMPLEMENTATION)
 #define FRAMEWORK_EXPORT __attribute__((visibility("default")))
@@ -56,6 +56,11 @@ class IBaseInterface : public IBaseRef {
 class ITask : public IBaseRef {
  public:
   virtual void Run() = 0;
+};
+
+enum class ThreadPoolTaskRunnerMode {
+  Shared,
+  Dedicated,
 };
 
 #define TASK_RUNNER_NAME "ITaskRunnerV1"
@@ -110,7 +115,15 @@ class IThread : public IBaseRef {
 #define FRAMEWORK_VERSION 1
 class IFramework : public IBaseInterface {
  public:
-  virtual bool Initialize(void* instance) = 0;
+  /**
+   * @brief
+   *
+   * @param instance Process instance
+   * @param create_thread_pool support thread pool. if true, than call
+   *            CreateThreadPoolTaskRunner will be success, otherwise failed.
+   * @return true on success, false on failed.
+   */
+  virtual bool Initialize(void* instance, bool create_thread_pool) = 0;
   virtual void UnInitialize() = 0;
   virtual bool CreateMessageLoop(bool nestable,
                                  MessageLoopType type,
@@ -118,6 +131,8 @@ class IFramework : public IBaseInterface {
   virtual bool CreateThread(MessageLoopType type,
                             const char* name,
                             IThread** thread) = 0;
+  virtual bool CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,
+                                          ITaskRunner** task_runner) = 0;
 };
 
 #endif /* __LIBEF_H__ */

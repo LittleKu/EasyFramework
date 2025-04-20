@@ -64,8 +64,21 @@ int main(int argc, char* argv[]) {
     if (query_interface != nullptr) {
       libef::ref_ptr<IFramework> framework = nullptr;
       if (query_interface(FRAMEWORK_NAME, reinterpret_cast<void**>(framework.addressof()))) {
-        framework->Initialize(instance);
+        framework->Initialize(instance, true);
         // Begin main loop
+        {
+          /* for thread pool task runner */
+          //libef::ref_ptr<ITaskRunner> thread_pool_task_runner = nullptr;
+          //framework->CreateThreadPoolTaskRunner(
+          //    ThreadPoolTaskRunnerMode::Shared,
+          //    thread_pool_task_runner.addressof());
+          //thread_pool_task_runner->PostDelayedTask(
+          //    new TaskImpl(base::BindOnce([]() {
+          //      OutputDebugString(
+          //          L",kkkkkkkkkkkkkkxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxk");
+          //    })),
+          //    1000);
+        }
 
         {
           libef::ref_ptr<IMessageLoop> message_loop = nullptr;

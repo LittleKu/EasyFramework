@@ -9,6 +9,7 @@
 
 #include "build/build_config.h"
 
+#include "libef/include/libef.h"
 #include "libef/wrapper/ref_impl.h"
 
 #include "base/at_exit.h"
@@ -35,7 +36,7 @@ class FrameworkImpl : public BaseRefImpl<IFramework> {
   unsigned int GetVersion() const override;
 
  public:
-  bool Initialize(void* instance) override;
+  bool Initialize(void* instance, bool create_thread_pool) override;
   void UnInitialize() override;
   bool CreateMessageLoop(bool nestable,
                          MessageLoopType type,
@@ -43,9 +44,12 @@ class FrameworkImpl : public BaseRefImpl<IFramework> {
   bool CreateThread(MessageLoopType type,
                     const char* name,
                     IThread** thread) override;
+  bool CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,
+                              ITaskRunner** task_runner) override;
 
  private:
   std::atomic_bool initialized_{false};
+  std::atomic_bool create_thread_pool_{false};
 #if BUILDFLAG(IS_WIN)
   Instance instance_{nullptr};
 #elif BUILDFLAG(IS_LINUX)
