@@ -7,6 +7,7 @@
 #ifndef LIBEF_WRAPPER_REF_PTR_H
 #define LIBEF_WRAPPER_REF_PTR_H
 
+#include <cstddef>
 #include <type_traits>
 
 namespace libef {
@@ -67,7 +68,7 @@ class ref_ptr {
 
   ~ref_ptr() noexcept { InternalRelease(); }
 
-  ref_ptr& operator=(std::nullopt_t) noexcept {
+  ref_ptr& operator=(std::nullptr_t) noexcept {
     InternalRelease();
     return *this;
   }
