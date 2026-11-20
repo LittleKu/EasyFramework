@@ -3,7 +3,7 @@ gclient_gn_args_from = 'src'
 vars = {}
 
 deps = {
-  'src': 'https://github.com/LittleKu/base@a5c8fdac2f1f0189d24e2d3920a182b8fdfc693a',
+  'src': 'https://github.com/LittleKu/base@07ba7f7ac381cff521003842195ea7f9519482a5',
 }
 
 hooks = [
