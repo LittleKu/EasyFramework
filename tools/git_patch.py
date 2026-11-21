@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def apply_patch(patch_file):
-    """Apply a single patch file using git apply."""
+    """Apply a single patch file, skipping it if already applied."""
     try:
         result = subprocess.run(['git', 'apply', '--check', str(patch_file)],
                                 capture_output=True, text=True)
@@ -16,9 +16,16 @@ def apply_patch(patch_file):
             subprocess.run(['git', 'apply', str(patch_file)], check=True)
             print(f"Successfully applied patch: {patch_file}")
             return True
-        else:
-            print(f"Failed to apply patch {patch_file}: {result.stderr}")
-            return False
+
+        reverse_result = subprocess.run(
+            ['git', 'apply', '--reverse', '--check', str(patch_file)],
+            capture_output=True, text=True)
+        if reverse_result.returncode == 0:
+            print(f"Skipping already applied patch: {patch_file}")
+            return True
+
+        print(f"Failed to apply patch {patch_file}: {result.stderr}")
+        return False
     except subprocess.CalledProcessError as e:
         print(f"Error applying patch {patch_file}: {str(e)}")
         return False
@@ -46,8 +53,8 @@ def process_patch_directory(directory):
             success_count += 1
 
     print(
-        f"\nSummary: Successfully applied {success_count} out of {len(patch_files)} patches.")
-    return success_count > 0
+        f"\nSummary: {success_count} out of {len(patch_files)} patches applied or already applied.")
+    return success_count == len(patch_files)
 
 
 def main():
