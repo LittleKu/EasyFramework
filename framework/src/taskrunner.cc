@@ -6,6 +6,8 @@
  */
 #include "libef/framework/src/taskrunner.h"
 
+#include "base/time/time.h"
+
 namespace libef {
 
 TaskRunnerImpl::TaskRunnerImpl(

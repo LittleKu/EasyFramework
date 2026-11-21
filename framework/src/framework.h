@@ -45,7 +45,7 @@ class FrameworkImpl : public BaseRefImpl<IFramework> {
                     const char* name,
                     IThread** thread) override;
   bool CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,
-                              ITaskRunner** task_runner) override;
+                                  ITaskRunner** task_runner) override;
 
  private:
   std::atomic_bool initialized_{false};
