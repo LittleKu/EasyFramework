@@ -1,11 +1,14 @@
 diff --git a/BUILD.gn b/BUILD.gn
-index e49b295..6da96fd 100644
+index 7952af5..6911972 100644
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -101,5 +101,5 @@ config("absl_flags_configs") {
- }
+@@ -92,8 +92,5 @@ config("absl_flags_configs") {
  
  group("default") {
--  deps = [ "//examples:execute" ]
-+  deps = [ "//libef:framework" ]
+   testonly = true
+-  deps = [
+-    "//examples:base_smoke_test",
+-    "//examples:example",
+-  ]
++  deps = ["//libef:framework"]
  }
