@@ -29,7 +29,7 @@ MessageLoopImpl::MessageLoopImpl(
               base::sequence_manager::QueueName::DEFAULT_TQ))) {
   DCHECK(sequence_manager_);
   DCHECK(task_queue_);
-  sequence_manager_->SetDefaultTaskRunner(task_queue_->task_runner());
+  sequence_manager_->SetDefaultTaskQueue(task_queue_.get());
   sequence_manager_->BindToMessagePump(base::MessagePump::Create(pump_type));
 }
 

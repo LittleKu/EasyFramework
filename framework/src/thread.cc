@@ -39,7 +39,7 @@ const char* ThreadImpl::GetName() const {
 }
 
 ThreadId ThreadImpl::GetThreadId() const {
-  return thread_->GetThreadId();
+  return thread_->GetThreadId().raw();
 }
 
 bool ThreadImpl::GetTaskRunner(ITaskRunner** runner) const {

@@ -112,7 +112,8 @@ bool FrameworkImpl::CreateThread(MessageLoopType type,
   return true;
 }
 
-bool FrameworkImpl::CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,ITaskRunner** task_runner) {
+bool FrameworkImpl::CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,
+                                               ITaskRunner** task_runner) {
   if (create_thread_pool_) {
     if (task_runner == nullptr) {
       return false;

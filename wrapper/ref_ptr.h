@@ -15,6 +15,13 @@ namespace libef {
 template <typename T>
 class ref_ptr {
  protected:
+  // Owns a reference via AddRef()/Release(); addressof() requires T* storage.
+  // Exempt this field from Chromium's raw_ptr check without depending on base.
+#if defined(__has_attribute)
+#if __has_attribute(annotate)
+  __attribute__((annotate("raw_ptr_exclusion")))
+#endif
+#endif
   T* ptr_ = nullptr;
 
   template <typename U>
