@@ -4,6 +4,7 @@
  * @date      : 2025-04-15 16:52:29
  * @brief     : 
  */
+#include "base/functional/bind.h"
 #include "build/build_config.h"
 #include "libef/include/libef.h"
 #include "libef/framework/src/framework.h"
@@ -14,6 +15,7 @@
 #endif
 
 #include <mutex>
+#include <utility>
 
 #if BUILDFLAG(IS_WIN)
 BOOL APIENTRY DllMain(HMODULE module,
@@ -28,10 +30,3 @@ BOOL APIENTRY DllMain(HMODULE module,
 
 #endif
 
-static libef::FrameworkImpl* framework = nullptr;
-FRAMEWORK_EXPORT bool QueryInterface(/*[in]*/ const char* interface_name,
-                                     /*[out]*/ void** interface) {
-  static std::once_flag flag;
-  std::call_once(flag, []() { framework = new libef::FrameworkImpl(); });
-  return framework->QueryInterface(interface_name, interface);
-}

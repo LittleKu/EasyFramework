@@ -13,6 +13,7 @@
 #include "libef/wrapper/ref_impl.h"
 
 #include "base/at_exit.h"
+#include "base/functional/callback.h"
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
@@ -28,8 +29,11 @@ namespace libef {
 
 class FrameworkImpl : public BaseRefImpl<IFramework> {
  public:
-  FrameworkImpl();
+  explicit FrameworkImpl(base::OnceCallback<void()> before_destruct);
   ~FrameworkImpl() override;
+
+ public: /* override IBaseRef */
+  bool Release() const override;
 
  public: /* override BaseInterface */
   bool QueryInterface(const char* interface_name, void** interface) override;
@@ -55,7 +59,8 @@ class FrameworkImpl : public BaseRefImpl<IFramework> {
 #elif BUILDFLAG(IS_LINUX)
 
 #endif
-  std::unique_ptr<base::AtExitManager> at_exit_manager_;
+  std::unique_ptr<base::AtExitManager> at_exit_manager_ = nullptr;
+  mutable base::OnceCallback<void()> before_destruct_;
 };
 
 }  // namespace libef

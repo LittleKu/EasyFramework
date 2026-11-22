@@ -15,10 +15,18 @@
 #include "base/task/thread_pool/thread_pool_instance.h"
 
 #include <string>
+#include <mutex>
+
+static libef::FrameworkImpl* framework = nullptr;
+static std::mutex framework_mutex;
 
 namespace libef {
 
 namespace {
+
+// Owned from Initialize until explicit shutdown or final destruction finishes.
+// AtExit callbacks can query and release a new instance during either path.
+std::atomic_flag at_exit_manager_in_use;
 
 base::MessagePumpType MessageLoopTypeToMessagePumpType(MessageLoopType type) {
   switch (type) {
@@ -34,11 +42,35 @@ base::MessagePumpType MessageLoopTypeToMessagePumpType(MessageLoopType type) {
   return base::MessagePumpType::DEFAULT;
 }
 
+void OnBeforeFrameworkDestructLocked() {
+  framework = nullptr;
+}
+
 }  // namespace
 
-FrameworkImpl::FrameworkImpl() = default;
+FrameworkImpl::FrameworkImpl(base::OnceCallback<void()> before_destruct)
+    : before_destruct_(std::move(before_destruct)) {}
 
 FrameworkImpl::~FrameworkImpl() = default;
+
+bool libef::FrameworkImpl::Release() const {
+  {
+    std::lock_guard lock(framework_mutex);
+    if (ref_count_.fetch_sub(1, std::memory_order_acq_rel) != 1) {
+      return false;
+    }
+    if (!before_destruct_.is_null()) {
+      std::move(before_destruct_).Run();
+    }
+  }
+  // Destruction can run AtExit callbacks that query the framework.
+  const bool owned_at_exit_manager = at_exit_manager_ != nullptr;
+  delete this;
+  if (owned_at_exit_manager) {
+    at_exit_manager_in_use.clear(std::memory_order_release);
+  }
+  return true;
+}
 
 bool FrameworkImpl::QueryInterface(const char* interface_name,
                                    void** interface) {
@@ -57,27 +89,32 @@ unsigned int FrameworkImpl::GetVersion() const {
 }
 
 bool FrameworkImpl::Initialize(void* instance, bool create_thread_pool) {
-  if (initialized_.load() == false) {
-    at_exit_manager_ = std::make_unique<base::AtExitManager>();
-    instance_ = reinterpret_cast<Instance>(instance);
-    initialized_.store(true);
-
-    if ((create_thread_pool_ = create_thread_pool)) {
-        base::ThreadPoolInstance::CreateAndStartWithDefaultParams("Easy_Framework");
-    }
-    return true;
+  if (at_exit_manager_in_use.test_and_set(std::memory_order_acquire)) {
+    return false;
   }
-  return false;
+  if (create_thread_pool && base::ThreadPoolInstance::Get()) {
+    at_exit_manager_in_use.clear(std::memory_order_release);
+    return false;
+  }
+
+  at_exit_manager_ = std::make_unique<base::AtExitManager>();
+  instance_ = reinterpret_cast<Instance>(instance);
+  if (create_thread_pool) {
+    base::ThreadPoolInstance::CreateAndStartWithDefaultParams("Easy_Framework");
+  }
+  create_thread_pool_.store(create_thread_pool);
+  initialized_.store(true);
+  return true;
 }
 
 void FrameworkImpl::UnInitialize() {
-  if (initialized_.load() == true) {
-    if (create_thread_pool_) {
+  if (initialized_.exchange(false)) {
+    if (create_thread_pool_.exchange(false)) {
       base::ThreadPoolInstance::Get()->Shutdown();
     }
     at_exit_manager_.reset();
     instance_ = nullptr;
-    initialized_.store(false);
+    at_exit_manager_in_use.clear(std::memory_order_release);
   }
 }
 
@@ -132,3 +169,14 @@ bool FrameworkImpl::CreateThreadPoolTaskRunner(ThreadPoolTaskRunnerMode mode,
 }
 
 }  // namespace libef
+
+
+FRAMEWORK_EXPORT bool QueryInterface(/*[in]*/ const char* interface_name,
+                                     /*[out]*/ void** interface) {
+    std::lock_guard lock(framework_mutex);
+    if (framework == nullptr) {
+      framework = new libef::FrameworkImpl(
+          base::BindOnce(&libef::OnBeforeFrameworkDestructLocked));
+    }
+  return framework->QueryInterface(interface_name, interface);
+}

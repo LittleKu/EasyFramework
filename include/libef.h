@@ -168,11 +168,12 @@ class IThread : public IBaseRef {
 class IFramework : public IBaseInterface {
  public:
   /**
-   * @brief
+   * @brief Initialize this instance. If a previous instance is still running
+   * its exit callbacks, retry after its final Release() returns.
    *
    * @param instance Process instance
-   * @param create_thread_pool support thread pool. if true, than call
-   *            CreateThreadPoolTaskRunner will be success, otherwise failed.
+   * @param create_thread_pool Request creation of the process thread pool.
+   *            Returns false if a pool is already registered.
    * @return true on success, false on failure.
    */
   virtual bool Initialize(void* instance, bool create_thread_pool) = 0;
