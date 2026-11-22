@@ -76,13 +76,13 @@ class ref_ptr {
   ~ref_ptr() noexcept { InternalRelease(); }
 
   ref_ptr& operator=(std::nullptr_t) noexcept {
-    InternalRelease();
+    reset();
     return *this;
   }
 
   ref_ptr& operator=(T* other) noexcept {
     if (ptr_ != other) {
-      raw_ref(other).swap(*this);
+      ref_ptr(other).swap(*this);
     }
     return *this;
   }
