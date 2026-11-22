@@ -14,6 +14,7 @@
 
 #include "base/at_exit.h"
 #include "base/functional/callback.h"
+#include "base/sequence_checker.h"
 
 #if BUILDFLAG(IS_WIN)
 #include "base/win/windows_types.h"
@@ -54,6 +55,7 @@ class FrameworkImpl : public BaseRefImpl<IFramework> {
  private:
   std::atomic_bool initialized_{false};
   std::atomic_bool create_thread_pool_{false};
+  SEQUENCE_CHECKER(thread_pool_sequence_checker_);
 #if BUILDFLAG(IS_WIN)
   Instance instance_{nullptr};
 #elif BUILDFLAG(IS_LINUX)

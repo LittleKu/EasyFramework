@@ -9,7 +9,7 @@
 #include "libef/framework/src/taskrunner.h"
 #include "libef/framework/src/thread.h"
 
-#include "base/check_op.h"
+#include "base/check.h"
 #include "base/task/task_traits.h"
 #include "base/task/thread_pool.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
@@ -49,9 +49,14 @@ void OnBeforeFrameworkDestructLocked() {
 }  // namespace
 
 FrameworkImpl::FrameworkImpl(base::OnceCallback<void()> before_destruct)
-    : before_destruct_(std::move(before_destruct)) {}
+    : before_destruct_(std::move(before_destruct)) {
+  DETACH_FROM_SEQUENCE(thread_pool_sequence_checker_);
+}
 
-FrameworkImpl::~FrameworkImpl() = default;
+FrameworkImpl::~FrameworkImpl() {
+  DCHECK(!create_thread_pool_.load())
+      << "Call UnInitialize() before releasing the last framework reference.";
+}
 
 bool libef::FrameworkImpl::Release() const {
   {
@@ -101,6 +106,7 @@ bool FrameworkImpl::Initialize(void* instance, bool create_thread_pool) {
   instance_ = reinterpret_cast<Instance>(instance);
   if (create_thread_pool) {
     base::ThreadPoolInstance::CreateAndStartWithDefaultParams("Easy_Framework");
+    DCHECK_CALLED_ON_VALID_SEQUENCE(thread_pool_sequence_checker_);
   }
   create_thread_pool_.store(create_thread_pool);
   initialized_.store(true);
@@ -108,6 +114,11 @@ bool FrameworkImpl::Initialize(void* instance, bool create_thread_pool) {
 }
 
 void FrameworkImpl::UnInitialize() {
+#if DCHECK_IS_ON()
+  if (create_thread_pool_.load()) {
+    DCHECK_CALLED_ON_VALID_SEQUENCE(thread_pool_sequence_checker_);
+  }
+#endif
   if (initialized_.exchange(false)) {
     if (create_thread_pool_.exchange(false)) {
       base::ThreadPoolInstance::Get()->Shutdown();

@@ -173,14 +173,18 @@ class IFramework : public IBaseInterface {
    *
    * @param instance Process instance
    * @param create_thread_pool Request creation of the process thread pool.
-   *            Returns false if a pool is already registered.
+   *            Returns false if a pool is already registered, even after shutdown.
+   *            On success with this flag set, call UnInitialize() on the same
+   *            sequence before releasing the last framework reference.
    * @return true on success, false on failure.
    */
   virtual bool Initialize(void* instance, bool create_thread_pool) = 0;
 
   /**
-   * @brief
-   *
+   * @brief Uninitialize the framework. If this instance started the pool,
+   * call this on the sequence that started it. Before calling, stop creating
+   * pool runners and posting tasks (including delayed tasks) to existing pool
+   * runners on all threads. Wait for any such calls in progress to return.
    */
   virtual void UnInitialize() = 0;
 
