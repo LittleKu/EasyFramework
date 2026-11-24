@@ -14,8 +14,9 @@
 #include "base/task/thread_pool.h"
 #include "base/task/thread_pool/thread_pool_instance.h"
 
-#include <string>
 #include <mutex>
+#include <string>
+#include <string_view>
 
 static libef::FrameworkImpl* framework = nullptr;
 static std::mutex framework_mutex;
@@ -79,9 +80,10 @@ bool libef::FrameworkImpl::Release() const {
 
 bool FrameworkImpl::QueryInterface(const char* interface_name,
                                    void** interface) {
-  if (std::char_traits<char>::compare(
-          interface_name, FRAMEWORK_NAME,
-          std::char_traits<char>::length(interface_name)) == 0) {
+  if (interface_name == nullptr || interface == nullptr) {
+    return false;
+  }
+  if (std::string_view(interface_name) == FRAMEWORK_NAME) {
     AddRef();
     *interface = this;
     return true;

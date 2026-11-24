@@ -13,6 +13,8 @@
 #include "base/task/sequence_manager/sequence_manager.h"
 #include "base/task/sequence_manager/sequence_manager_impl.h"
 
+#include <string_view>
+
 namespace libef {
 
 MessageLoopImpl::MessageLoopImpl(
@@ -37,9 +39,10 @@ MessageLoopImpl::~MessageLoopImpl() = default;
 
 bool MessageLoopImpl::QueryInterface(const char* interface_name,
                                      void** interface) {
-  if (std::char_traits<char>::compare(
-          interface_name, TASK_RUNNER_NAME,
-          std::char_traits<char>::length(interface_name)) == 0) {
+  if (interface_name == nullptr || interface == nullptr) {
+    return false;
+  }
+  if (std::string_view(interface_name) == TASK_RUNNER_NAME) {
     auto* task_runner = new TaskRunnerImpl(task_queue_->task_runner());
     task_runner->AddRef();
     *interface = task_runner;
