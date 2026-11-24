@@ -9,6 +9,8 @@ executable("example") {
 
   sources = [ "example.cc" ]
 
-  configs += [ "//build/config/win:windowed" ]
-  configs -= [ "//build/config/win:console" ]
+  if (is_win) {
+    configs += [ "//build/config/win:windowed" ]
+    configs -= [ "//build/config/win:console" ]
+  }
 }

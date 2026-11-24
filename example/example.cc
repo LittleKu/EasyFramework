@@ -52,6 +52,7 @@ int WINAPI wWinMain(HINSTANCE instance,
 
 int main(int argc, char* argv[]) {
   base::CommandLine::Init(argc, argv);
+  void* instance = nullptr;
 #endif
   base::AtExitManager exit_manager;
   base::FilePath lib_path;
