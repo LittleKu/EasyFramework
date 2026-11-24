@@ -46,6 +46,7 @@ class ref_ptr {
   constexpr ref_ptr(std::nullptr_t) noexcept : ptr_(nullptr) {}
 
   template <typename U>
+    requires std::is_convertible_v<U*, T*>
   ref_ptr(U* ptr) noexcept : ptr_(ptr) {
     InternalAddRef();
   }
@@ -88,6 +89,7 @@ class ref_ptr {
   }
 
   template <typename U>
+    requires std::is_convertible_v<U*, T*>
   ref_ptr& operator=(U* other) noexcept {
     ref_ptr(other).swap(*this);
     return *this;
@@ -101,6 +103,7 @@ class ref_ptr {
   }
 
   template <typename U>
+    requires std::is_convertible_v<U*, T*>
   ref_ptr& operator=(const ref_ptr<U>& other) noexcept {
     ref_ptr(other).swap(*this);
     return *this;
@@ -112,6 +115,7 @@ class ref_ptr {
   }
 
   template <typename U>
+    requires std::is_convertible_v<U*, T*>
   ref_ptr& operator=(ref_ptr<U>&& other) noexcept {
     ref_ptr(static_cast<ref_ptr<U>&&>(other)).swap(*this);
     return *this;
